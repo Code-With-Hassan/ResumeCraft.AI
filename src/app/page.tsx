@@ -1,90 +1,60 @@
-"use client";
-
-import { useState } from "react";
-import type { ResumeData, Template } from "@/lib/types";
-import { templates } from "@/lib/templates";
-import Header from "@/components/layout/header";
-import ResumeForm from "@/components/resume/resume-form";
-import ResumePreview from "@/components/resume/resume-preview";
-import TemplateSelector from "@/components/resume/template-selector";
-import AdPlaceholder from "@/components/ad-placeholder";
-
-const initialResumeData: ResumeData = {
-  personal: {
-    name: "Jane Doe",
-    email: "jane.doe@example.com",
-    phone: "123-456-7890",
-    website: "janedoe.io",
-  },
-  education: [
-    {
-      institution: "Global University",
-      degree: "M.S. in Data Science",
-      startDate: "Sep 2020",
-      endDate: "Jun 2022",
-      details: "Thesis on predictive modeling for e-commerce.",
-    },
-     {
-      institution: "State College",
-      degree: "B.S. in Computer Science",
-      startDate: "Aug 2016",
-      endDate: "May 2020",
-      details: "Graduated with Magna Cum Laude honors.",
-    },
-  ],
-  experience: [
-    {
-      company: "Innovate Inc.",
-      title: "Senior Software Engineer",
-      startDate: "Jul 2022",
-      endDate: "Present",
-      description: "Led a team of developers in creating a scalable microservices architecture. Improved application performance by 30% through code optimization and database tuning.",
-    },
-    {
-      company: "DataDriven LLC",
-      title: "Junior Developer",
-      startDate: "Jun 2020",
-      endDate: "Jun 2022",
-      description: "Developed features for a customer relationship management (CRM) platform using Angular and .NET Core. Wrote and maintained unit tests to ensure code quality.",
-    },
-  ],
-  skills: "TypeScript, React, Node.js, Python, PostgreSQL, AWS, Docker, Kubernetes",
-};
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { MoveRight, Code, ShieldCheck, FileText } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Home() {
-  const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
-  const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
-  
-  return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 w-full container mx-auto p-4 md:p-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-primary">Craft Your Future with AI</h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Input your details, choose a template, and let our AI enhance your resume to perfection.
-          </p>
-        </div>
-        
-        <TemplateSelector
-          templates={templates}
-          selectedTemplate={selectedTemplate}
-          onSelect={setSelectedTemplate}
-        />
+  const features = [
+    {
+      icon: <FileText className="w-8 h-8 text-primary" />,
+      title: 'AI-Powered Content',
+      description: 'Generate compelling resume content with our advanced AI.',
+    },
+    {
+      icon: <ShieldCheck className="w-8 h-8 text-primary" />,
+      title: 'ATS-Optimized',
+      description: 'Ensure your resume gets past automated screeners.',
+    },
+    {
+      icon: <Code className="w-8 h-8 text-primary" />,
+      title: 'Futuristic Templates',
+      description: 'Choose from a variety of sleek, modern templates.',
+    },
+  ];
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-5 flex flex-col gap-8">
-            <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
-            <AdPlaceholder />
-          </div>
-          <div className="lg:col-span-7 lg:sticky top-8">
-            <ResumePreview resumeData={resumeData} template={selectedTemplate} />
-          </div>
+  return (
+    <div className="space-y-16">
+      <section className="text-center py-20">
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+          Engineer Your Career&apos;s Future
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+          Harness the power of AI to build a resume that transcends the ordinary.
+          Our futuristic tools and templates will set you apart.
+        </p>
+        <Link href="/builder">
+          <Button size="lg" className="glow-on-hover">
+            Start Building
+            <MoveRight className="ml-2 h-5 w-5" />
+          </Button>
+        </Link>
+      </section>
+
+      <section>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <Card key={index} className="bg-secondary/50 border-primary/20">
+              <CardHeader className="flex flex-row items-center gap-4">
+                {feature.icon}
+                <CardTitle>{feature.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{feature.description}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      </main>
-      <footer className="py-6 text-center text-muted-foreground text-sm border-t mt-12">
-        © {new Date().getFullYear()} ResumeCraft AI. All Rights Reserved.
-      </footer>
+      </section>
     </div>
   );
 }
