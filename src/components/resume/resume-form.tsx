@@ -2,14 +2,14 @@
 
 import type { Dispatch, SetStateAction } from "react";
 import type { ResumeData, Experience, Education } from "@/lib/types";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2 } from "lucide-react";
+import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { improveResumeContent } from "@/ai/flows/improve-resume-content";
 
@@ -21,6 +21,7 @@ interface ResumeFormProps {
 export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProps) {
   const { toast } = useToast();
   const [isImproving, setIsImproving] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -111,15 +112,84 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
     }
   };
 
+  const handleSaveData = () => {
+    try {
+      const jsonString = JSON.stringify(resumeData, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resume-data.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({ title: 'Data Saved!', description: 'Your resume data has been saved as resume-data.json.' });
+    } catch (error) {
+      console.error("Failed to save data", error);
+      toast({ title: 'Error', description: 'Could not save resume data.', variant: 'destructive' });
+    }
+  };
+
+  const handleLoadData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result;
+        if (typeof text === 'string') {
+          const loadedData = JSON.parse(text);
+          // Basic validation to ensure the loaded data has the expected structure
+          if (loadedData.personal && loadedData.experience && loadedData.education && loadedData.skills !== undefined) {
+            setResumeData(loadedData);
+            toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded successfully.' });
+          } else {
+            throw new Error("Invalid JSON structure.");
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load or parse data", error);
+        toast({ title: 'Error Loading Data', description: 'The selected file is not a valid resume JSON file.', variant: 'destructive' });
+      }
+    };
+    reader.readAsText(file);
+    
+    // Reset file input value to allow loading the same file again
+    if(fileInputRef.current) {
+        fileInputRef.current.value = "";
+    }
+  };
+
+  const handleLoadClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl">
-          Input Your Details
-        </CardTitle>
-        <CardDescription>
-          Provide your information below. Use the magic wand to get AI suggestions!
-        </CardDescription>
+        <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                Input Your Details
+              </CardTitle>
+              <CardDescription>
+                Provide your information below. Use the magic wand to get AI suggestions!
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={handleSaveData}><Save className="mr-2 h-4 w-4" />Save</Button>
+                <Button variant="outline" onClick={handleLoadClick}><Upload className="mr-2 h-4 w-4" />Load</Button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleLoadData}
+                    accept="application/json"
+                    className="hidden"
+                />
+            </div>
+        </div>
       </CardHeader>
       <CardContent>
         <Accordion type="multiple" defaultValue={['personal-info']} className="w-full space-y-4">
