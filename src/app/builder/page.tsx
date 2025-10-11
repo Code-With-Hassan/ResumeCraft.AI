@@ -63,14 +63,13 @@ export default function BuilderPage() {
         </p>
       </div>
       
-      <TemplateSelector
-        templates={templates}
-        selectedTemplate={selectedTemplate}
-        onSelect={setSelectedTemplate}
-      />
-
-      <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-5 flex flex-col gap-8">
+           <TemplateSelector
+            templates={templates}
+            selectedTemplate={selectedTemplate}
+            onSelect={setSelectedTemplate}
+          />
           <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
           <AdPlaceholder />
         </div>

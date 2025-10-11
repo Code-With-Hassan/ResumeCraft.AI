@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2 } from "lucide-react";
+import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { improveResumeContent } from "@/ai/flows/improve-resume-content";
 
@@ -115,7 +115,7 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
     <Card className="shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-2xl">
-          2. Fill in Your Details
+          Input Your Details
         </CardTitle>
         <CardDescription>
           Provide your information below. Use the magic wand to get AI suggestions!
@@ -124,14 +124,13 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
       <CardContent>
         <Accordion type="multiple" defaultValue={['personal-info']} className="w-full space-y-4">
           
-          <AccordionItem value="personal-info" className="border-b-0">
-            <Card>
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline">
+          <AccordionItem value="personal-info" className="border rounded-lg overflow-hidden">
+             <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-primary" /> Personal Information
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-0 space-y-4">
+              <AccordionContent className="p-4 pt-2 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2"><Label htmlFor="name">Full Name</Label><Input id="name" name="name" value={resumeData.personal.name} onChange={handlePersonalInfoChange} /></div>
                   <div className="space-y-2"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" value={resumeData.personal.email} onChange={handlePersonalInfoChange} /></div>
@@ -139,19 +138,17 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                   <div className="space-y-2"><Label htmlFor="website">Website/Portfolio</Label><Input id="website" name="website" value={resumeData.personal.website} onChange={handlePersonalInfoChange} /></div>
                 </div>
               </AccordionContent>
-            </Card>
           </AccordionItem>
 
-          <AccordionItem value="experience" className="border-b-0">
-             <Card>
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline">
+          <AccordionItem value="experience" className="border-b-0 border rounded-lg overflow-hidden">
+              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
                 <div className="flex items-center gap-3">
                   <Briefcase className="h-5 w-5 text-primary" /> Work Experience
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-0 space-y-6">
+              <AccordionContent className="p-4 pt-2 space-y-6">
                 {resumeData.experience.map((exp, index) => (
-                  <div key={index} className="space-y-4 p-4 border rounded-lg relative">
+                  <div key={index} className="space-y-4 p-4 border rounded-lg relative bg-background/50">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2"><Label>Title</Label><Input name="title" value={exp.title} onChange={(e) => handleExperienceChange(index, e)} /></div>
                       <div className="space-y-2"><Label>Company</Label><Input name="company" value={exp.company} onChange={(e) => handleExperienceChange(index, e)} /></div>
@@ -161,8 +158,8 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                     <div className="space-y-2 relative">
                       <Label>Description</Label>
                       <Textarea name="description" value={exp.description} onChange={(e) => handleExperienceChange(index, e)} rows={4} />
-                       <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('experience', index)} disabled={isImproving === `experience-${index}`}>
-                        <Sparkles className={`mr-2 h-4 w-4 ${isImproving === `experience-${index}` ? 'animate-spin' : ''}`} />
+                       <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('experience', index)} disabled={!!isImproving}>
+                        {isImproving === `experience-${index}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Improve
                       </Button>
                     </div>
@@ -171,19 +168,17 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                 ))}
                 <Button variant="outline" onClick={addExperience}><PlusCircle className="mr-2 h-4 w-4" /> Add Experience</Button>
               </AccordionContent>
-            </Card>
           </AccordionItem>
           
-          <AccordionItem value="education" className="border-b-0">
-             <Card>
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline">
+          <AccordionItem value="education" className="border-b-0 border rounded-lg overflow-hidden">
+              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
                 <div className="flex items-center gap-3">
                   <GraduationCap className="h-5 w-5 text-primary" /> Education
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-0 space-y-6">
+              <AccordionContent className="p-4 pt-2 space-y-6">
                  {resumeData.education.map((edu, index) => (
-                  <div key={index} className="space-y-4 p-4 border rounded-lg relative">
+                  <div key={index} className="space-y-4 p-4 border rounded-lg relative bg-background/50">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2"><Label>Institution</Label><Input name="institution" value={edu.institution} onChange={(e) => handleEducationChange(index, e)} /></div>
                       <div className="space-y-2"><Label>Degree</Label><Input name="degree" value={edu.degree} onChange={(e) => handleEducationChange(index, e)} /></div>
@@ -193,8 +188,8 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                      <div className="space-y-2 relative">
                       <Label>Details / Achievements</Label>
                       <Textarea name="details" value={edu.details} onChange={(e) => handleEducationChange(index, e)} rows={2} />
-                      <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('education', index)} disabled={isImproving === `education-${index}`}>
-                        <Sparkles className={`mr-2 h-4 w-4 ${isImproving === `education-${index}` ? 'animate-spin' : ''}`} />
+                      <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('education', index)} disabled={!!isImproving}>
+                        {isImproving === `education-${index}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Improve
                       </Button>
                     </div>
@@ -203,27 +198,24 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                 ))}
                 <Button variant="outline" onClick={addEducation}><PlusCircle className="mr-2 h-4 w-4" /> Add Education</Button>
               </AccordionContent>
-            </Card>
           </AccordionItem>
 
-          <AccordionItem value="skills" className="border-b-0">
-             <Card>
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline">
+          <AccordionItem value="skills" className="border-b-0 border rounded-lg overflow-hidden">
+              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
                 <div className="flex items-center gap-3">
                   <Wrench className="h-5 w-5 text-primary" /> Skills
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-0 space-y-4">
+              <AccordionContent className="p-4 pt-2 space-y-4">
                 <div className="space-y-2 relative">
                   <Label htmlFor="skills">Skills (comma-separated)</Label>
                   <Textarea id="skills" value={resumeData.skills} onChange={handleSkillsChange} rows={3} />
-                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('skills')} disabled={isImproving === 'skills'}>
-                    <Sparkles className={`mr-2 h-4 w-4 ${isImproving === 'skills' ? 'animate-spin' : ''}`} />
+                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('skills')} disabled={!!isImproving}>
+                    {isImproving === 'skills' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Improve
                   </Button>
                 </div>
               </AccordionContent>
-            </Card>
           </AccordionItem>
 
         </Accordion>
