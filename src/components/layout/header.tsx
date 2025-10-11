@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About Us' },
   { href: '/blogs', label: 'Blogs' },
+  { href: '/pricing', label: 'Pricing' },
   { href: '/contact', label: 'Contact Us' },
   { href: '/builder', label: 'Builder' },
 ];
@@ -55,8 +56,12 @@ export default function Header() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-            <Button variant="ghost">Log In</Button>
-            <Button className="glow-on-hover">Sign Up</Button>
+            <Button variant="ghost" asChild>
+              <Link href="/login">Log In</Link>
+            </Button>
+            <Button className="glow-on-hover" asChild>
+              <Link href="/signup">Sign Up</Link>
+            </Button>
         </div>
         <div className="md:hidden">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -77,6 +82,14 @@ export default function Header() {
                     {link.label}
                   </Link>
                 ))}
+                 <div className="flex flex-col gap-4 mt-4">
+                  <Button variant="outline" asChild>
+                    <Link href="/login" onClick={() => setIsSheetOpen(false)}>Log In</Link>
+                  </Button>
+                  <Button className="glow-on-hover" asChild>
+                     <Link href="/signup" onClick={() => setIsSheetOpen(false)}>Sign Up</Link>
+                  </Button>
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
