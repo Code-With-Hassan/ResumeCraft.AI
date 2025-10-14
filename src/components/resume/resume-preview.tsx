@@ -2,77 +2,25 @@
 "use client";
 
 import type { ResumeData, Template, ATSCheckResult } from "@/lib/types";
-import React, { useMemo, useState } from "react";
+import React, from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, ShieldCheck, FileText, Loader2, Star } from "lucide-react";
+import { Download, ShieldCheck, Loader2, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { checkResumeAgainstATS } from "@/ai/flows/check-resume-against-ats";
 import ATSCheckerDialog from "./ats-checker-dialog";
 import { useAuth } from "@/lib/auth";
+import { fillTemplate } from "@/lib/template-utils";
+import MarkdownRenderer from "./markdown-renderer";
+
 
 interface ResumePreviewProps {
   resumeData: ResumeData;
   template: Template;
   adsWatched: number;
 }
-
-const MarkdownRenderer = ({ content, templateId }: { content: string, templateId: string }) => {
-  return (
-    <div className={cn("prose prose-sm dark:prose-invert max-w-none", templateId === "bold-accent" && "prose-headings:text-primary")}>
-      {content.split('\n').map((line, index) => {
-        if (line.trim() === '') return null;
-        if (line.startsWith('### ')) return <h3 key={index} className="text-lg font-semibold mb-1 mt-3">{line.substring(4).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')}</h3>;
-        if (line.startsWith('## ')) return <h2 key={index} className="text-xl font-bold border-b pb-2 mb-2 mt-4">{line.substring(3)}</h2>;
-        if (line.startsWith('# ')) return <h1 key={index} className="text-3xl font-bold mb-2" dangerouslySetInnerHTML={{ __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />;
-        if (line.startsWith('> ')) return <blockquote key={index} className="border-l-4 border-primary pl-4 text-muted-foreground italic my-2">{line.substring(2)}</blockquote>;
-        if (line.startsWith('---')) return <hr key={index} className="my-4" />;
-        if (line.startsWith('- ')) return <li key={index} className="ml-4" dangerouslySetInnerHTML={{ __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
-        
-        const formattedLine = line
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        return <p key={index} dangerouslySetInnerHTML={{ __html: formattedLine }} />;
-      })}
-    </div>
-  );
-};
-
-
-const fillTemplate = (template: string, data: ResumeData): string => {
-    let output = template;
-    Object.entries(data.personal).forEach(([key, value]) => {
-      output = output.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
-    });
-  
-    const processSection = (sectionName: 'experience' | 'education') => {
-      const regex = new RegExp(`{{#${sectionName}}}(.*?){{\/${sectionName}}}`, 'gs');
-      const match = output.match(regex);
-      if (match) {
-        const itemTemplate = match[0].replace(`{{#${sectionName}}}`, '').replace(`{{/${sectionName}}}`, '').trim();
-        const items = data[sectionName];
-        if (Array.isArray(items)) {
-          const allItems = items.map(item => {
-            let temp = itemTemplate;
-            Object.entries(item).forEach(([key, value]) => {
-              temp = temp.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
-            });
-            return temp;
-          }).join('\n\n');
-          output = output.replace(regex, allItems);
-        }
-      }
-    };
-  
-    processSection('experience');
-    processSection('education');
-    
-    output = output.replace(/{{skills}}/g, data.skills || '');
-    return output;
-};
-
 
 export default function ResumePreview({ resumeData, template, adsWatched }: ResumePreviewProps) {
   const { toast } = useToast();
