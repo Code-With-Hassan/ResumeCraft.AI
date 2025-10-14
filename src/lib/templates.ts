@@ -68,4 +68,68 @@ export const templates: Template[] = [
 - {{skills}}
     `,
   },
+  {
+    id: 'corporate',
+    name: 'Corporate',
+    isPremium: false,
+    markdown: `
+## {{name}}
+{{email}} | {{phone}} | {{website}}
+
+---
+### **PROFESSIONAL SUMMARY**
+A brief summary of your career goals and qualifications.
+
+---
+### **WORK EXPERIENCE**
+{{#experience}}
+**{{title}}**, {{company}} ({{startDate}} - {{endDate}})
+- {{description}}
+{{/experience}}
+
+---
+### **EDUCATION**
+{{#education}}
+**{{institution}}** ({{startDate}} - {{endDate}})
+*{{degree}}*
+- {{details}}
+{{/education}}
+
+---
+### **SKILLS**
+- {{skills}}
+    `
+  },
+  {
+    id: 'creative',
+    name: 'Creative',
+    isPremium: true,
+    markdown: `
+# {{name}}
+
+> A creative and driven professional.
+
+### Contact
+- Email: {{email}}
+- Phone: {{phone}}
+- Portfolio: {{website}}
+
+---
+
+### Work Experience
+{{#experience}}
+- **{{title}}** at *{{company}}* ({{startDate}} - {{endDate}})
+  - {{description}}
+{{/experience}}
+
+### Education
+{{#education}}
+- **{{degree}}**, *{{institution}}* ({{startDate}} - {{endDate}})
+  - {{details}}
+{{/education}}
+
+### Skills
+> {{skills}}
+    `
+  }
 ];
