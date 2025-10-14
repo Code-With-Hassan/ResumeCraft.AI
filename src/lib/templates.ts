@@ -1,3 +1,4 @@
+
 import type { Template } from './types';
 
 export const templates: Template[] = [
@@ -7,26 +8,27 @@ export const templates: Template[] = [
     isPremium: false,
     markdown: `
 # {{name}}
-> {{email}} | {{phone}} | {{website}}
+{{email}} • {{phone}} • {{website}}
+
+---
 
 ## Experience
----
 {{#experience}}
-### **{{title}}** at {{company}}
-*{{startDate}} - {{endDate}}*
+### **{{title}}** | {{company}}
+*{{startDate}} – {{endDate}}*
+
 - {{description}}
 {{/experience}}
 
 ## Education
----
 {{#education}}
-### **{{degree}}**, {{institution}}
-*{{startDate}} - {{endDate}}*
+### **{{degree}}** | {{institution}}
+*{{startDate}} – {{endDate}}*
+
 - {{details}}
 {{/education}}
 
 ## Skills
----
 - {{skills}}
     `,
   },
@@ -36,35 +38,29 @@ export const templates: Template[] = [
     isPremium: true,
     markdown: `
 # **{{name}}**
-
-**Contact:** {{email}} | {{phone}} | {{website}}
+> {{email}} • {{phone}} • {{website}}
 
 ---
 
-## PROFESSIONAL EXPERIENCE
-
+### PROFESSIONAL EXPERIENCE
 {{#experience}}
-**{{title}}** | *{{company}}*
-{{startDate}} to {{endDate}}
-
+**{{title}}** at *{{company}}*
+*{{startDate}} - {{endDate}}*
 - {{description}}
 {{/experience}}
 
----
+<br/>
 
-## EDUCATION
-
+### EDUCATION
 {{#education}}
-**{{degree}}** | *{{institution}}*
-{{startDate}} to {{endDate}}
-
+**{{degree}}** at *{{institution}}*
+*{{startDate}} - {{endDate}}*
 - {{details}}
 {{/education}}
 
----
+<br/>
 
-## KEY SKILLS
-
+### KEY SKILLS
 - {{skills}}
     `,
   },
@@ -77,26 +73,27 @@ export const templates: Template[] = [
 {{email}} | {{phone}} | {{website}}
 
 ---
-### **PROFESSIONAL SUMMARY**
-A brief summary of your career goals and qualifications.
+### **Professional Summary**
+> A brief summary of your career goals and qualifications. This section can be edited in the markdown template.
 
 ---
-### **WORK EXPERIENCE**
+### **Work Experience**
 {{#experience}}
-**{{title}}**, {{company}} ({{startDate}} - {{endDate}})
+**{{title}}**, {{company}}
+*{{startDate}} - {{endDate}}*
 - {{description}}
+---
 {{/experience}}
 
----
-### **EDUCATION**
+### **Education**
 {{#education}}
-**{{institution}}** ({{startDate}} - {{endDate}})
-*{{degree}}*
+**{{institution}}**, *{{degree}}*
+*{{startDate}} - {{endDate}}*
 - {{details}}
+---
 {{/education}}
 
----
-### **SKILLS**
+### **Skills**
 - {{skills}}
     `
   },
@@ -107,28 +104,32 @@ A brief summary of your career goals and qualifications.
     markdown: `
 # {{name}}
 
-> A creative and driven professional.
+> A creative and driven professional with a passion for innovation. This section can be edited in the markdown template.
 
-### Contact
-- Email: {{email}}
-- Phone: {{phone}}
-- Portfolio: {{website}}
+### **Contact**
+- **Email:** {{email}}
+- **Phone:** {{phone}}
+- **Portfolio:** {{website}}
 
 ---
 
-### Work Experience
+### **Experience**
 {{#experience}}
 - **{{title}}** at *{{company}}* ({{startDate}} - {{endDate}})
   - {{description}}
 {{/experience}}
 
-### Education
+---
+
+### **Education**
 {{#education}}
 - **{{degree}}**, *{{institution}}* ({{startDate}} - {{endDate}})
   - {{details}}
 {{/education}}
 
-### Skills
+---
+
+### **Skills**
 > {{skills}}
     `
   }
