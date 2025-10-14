@@ -11,6 +11,8 @@ import AdPlaceholder from "@/components/ad-placeholder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PenSquare, LayoutTemplate, Send } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { AdFactory } from "@/lib/ads/AdFactory";
+import { useToast } from "@/hooks/use-toast";
 
 const initialResumeData: ResumeData = {
   personal: {
@@ -59,13 +61,43 @@ export default function BuilderPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
   const [adsWatched, setAdsWatched] = useState(0);
   const { user } = useAuth();
+  const { toast } = useToast();
 
-  const handleWatchAd = () => {
+  const handleWatchAd = async () => {
     if (adsWatched < 3) {
-      setAdsWatched(prev => prev + 1);
+      const adNetwork = AdFactory.getAdNetwork('GoogleAdSense');
+      try {
+        const adWatched = await adNetwork.showRewardedAd();
+        if (adWatched) {
+          setAdsWatched(prev => prev + 1);
+          toast({
+            title: "Ad Watched!",
+            description: "Thank you for supporting our platform.",
+          });
+        } else {
+          toast({
+            title: "Ad Skipped",
+            description: "You must watch the ad to get the reward.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Ad error:", error);
+        toast({
+          title: "Ad Error",
+          description: "Could not load ad. Please try again later.",
+          variant: "destructive",
+        });
+      }
     }
   };
   
+  const incrementAdsWatched = () => {
+     if (adsWatched < 3) {
+      setAdsWatched(prev => prev + 1);
+    }
+  }
+
   return (
     <>
       <div className="text-center mb-12">
@@ -87,7 +119,8 @@ export default function BuilderPage() {
                 <ResumeForm 
                   resumeData={resumeData} 
                   setResumeData={setResumeData} 
-                  onWatchAd={handleWatchAd}
+                  onWatchAd={incrementAdsWatched}
+                  adsWatched={adsWatched}
                 />
               </TabsContent>
               <TabsContent value="template">

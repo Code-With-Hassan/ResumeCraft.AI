@@ -24,11 +24,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { AdFactory } from "@/lib/ads/AdFactory";
 
 interface ResumeFormProps {
   resumeData: ResumeData;
   setResumeData: Dispatch<SetStateAction<ResumeData>>;
   onWatchAd: () => void;
+  adsWatched: number;
 }
 
 type ImprovementRequest = {
@@ -36,7 +38,7 @@ type ImprovementRequest = {
     index?: number
 } | null;
 
-export default function ResumeForm({ resumeData, setResumeData, onWatchAd }: ResumeFormProps) {
+export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWatched }: ResumeFormProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isImproving, setIsImproving] = useState<string | null>(null);
@@ -101,11 +103,35 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd }: Res
     setAdDialogOpen(true);
   };
   
-  const handleConfirmWatchAd = () => {
+  const handleConfirmWatchAd = async () => {
       if (currentImprovementRequest) {
-        onWatchAd();
-        handleImproveContent(currentImprovementRequest.type, currentImprovementRequest.index);
+        const adNetwork = AdFactory.getAdNetwork('GoogleAdSense');
+        try {
+          const adWatched = await adNetwork.showRewardedAd();
+          if (adWatched) {
+            onWatchAd(); // This increments the counter on the parent
+            toast({
+              title: "Ad Watched!",
+              description: "Thank you for supporting us! Improving content...",
+            });
+            handleImproveContent(currentImprovementRequest.type, currentImprovementRequest.index);
+          } else {
+            toast({
+              title: "Ad Skipped",
+              description: "You must watch the ad to use AI features.",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+           console.error("Ad error:", error);
+           toast({
+              title: "Ad Error",
+              description: "Could not load ad. Please try again later.",
+              variant: "destructive",
+           });
+        }
       }
+      setCurrentImprovementRequest(null);
   }
 
   const handleImproveContent = async (
@@ -341,7 +367,7 @@ a.click();
             <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center gap-2"><Video /> Watch Ad to Improve</AlertDialogTitle>
                 <AlertDialogDescription>
-                    To use our AI content improvement feature, you need to watch a short rewarded ad. This helps us keep our basic AI tools free!
+                    To use our AI content improvement feature, you need to watch a short rewarded ad. This helps us keep our AI tools available.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
