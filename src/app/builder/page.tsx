@@ -53,6 +53,13 @@ const initialResumeData: ResumeData = {
 export default function BuilderPage() {
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
+  const [adsWatched, setAdsWatched] = useState(0);
+
+  const handleWatchAd = () => {
+    if (adsWatched < 3) {
+      setAdsWatched(prev => prev + 1);
+    }
+  };
   
   return (
     <>
@@ -71,10 +78,10 @@ export default function BuilderPage() {
             onSelect={setSelectedTemplate}
           />
           <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
-          <AdPlaceholder />
+          <AdPlaceholder adsWatched={adsWatched} onWatchAd={handleWatchAd} />
         </div>
         <div className="lg:col-span-7 lg:sticky top-8">
-          <ResumePreview resumeData={resumeData} template={selectedTemplate} />
+          <ResumePreview resumeData={resumeData} template={selectedTemplate} adsWatched={adsWatched} />
         </div>
       </div>
     </>

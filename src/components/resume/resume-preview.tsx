@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/auth";
 interface ResumePreviewProps {
   resumeData: ResumeData;
   template: Template;
+  adsWatched: number;
 }
 
 const MarkdownRenderer = ({ content, templateId }: { content: string, templateId: string }) => {
@@ -72,22 +73,32 @@ const fillTemplate = (template: string, data: ResumeData): string => {
 };
 
 
-export default function ResumePreview({ resumeData, template }: ResumePreviewProps) {
+export default function ResumePreview({ resumeData, template, adsWatched }: ResumePreviewProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [atsResult, setAtsResult] = useState<ATSCheckResult>(null);
   const [isAtsLoading, setIsAtsLoading] = useState(false);
   const [isAtsDialogOpen, setIsAtsDialogOpen] = useState(false);
+  
+  const canDownloadPdf = user && adsWatched >= 3;
 
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
 
   const handleDownload = (format: 'md' | 'pdf') => {
-    if (format === 'pdf' && !user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to download your resume as a PDF.",
-        variant: "destructive",
-      });
+    if (format === 'pdf' && !canDownloadPdf) {
+      if(!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to download your resume as a PDF.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Watch Ads to Download",
+          description: `Please watch ${3-adsWatched} more ad(s) to download your resume as a PDF.`,
+          variant: "destructive",
+        });
+      }
       return;
     }
 
@@ -152,7 +163,7 @@ export default function ResumePreview({ resumeData, template }: ResumePreviewPro
                 {isAtsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
                 Check ATS
               </Button>
-              <Button size="sm" onClick={() => handleDownload('pdf')} className="glow-on-hover">
+              <Button size="sm" onClick={() => handleDownload('pdf')} className={cn(canDownloadPdf && "glow-on-hover")} disabled={!canDownloadPdf}>
                 <Download className="mr-2 h-4 w-4" /> PDF {template.isPremium && <Star className="ml-2 h-3 w-3 fill-amber-300 text-amber-500" />}
               </Button>
             </div>
