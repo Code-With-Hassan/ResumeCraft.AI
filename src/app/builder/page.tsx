@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -7,6 +8,8 @@ import ResumeForm from "@/components/resume/resume-form";
 import ResumePreview from "@/components/resume/resume-preview";
 import TemplateSelector from "@/components/resume/template-selector";
 import AdPlaceholder from "@/components/ad-placeholder";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PenSquare, LayoutTemplate, Send } from "lucide-react";
 
 const initialResumeData: ResumeData = {
   personal: {
@@ -71,14 +74,27 @@ export default function BuilderPage() {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-5 flex flex-col gap-8">
-           <TemplateSelector
-            templates={templates}
-            selectedTemplate={selectedTemplate}
-            onSelect={setSelectedTemplate}
-          />
-          <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
-          <AdPlaceholder adsWatched={adsWatched} onWatchAd={handleWatchAd} />
+        <div className="lg:col-span-5">
+            <Tabs defaultValue="edit" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="edit"><PenSquare className="mr-2 h-4 w-4"/> Edit</TabsTrigger>
+                <TabsTrigger value="template"><LayoutTemplate className="mr-2 h-4 w-4"/> Template</TabsTrigger>
+                <TabsTrigger value="export"><Send className="mr-2 h-4 w-4"/> Export</TabsTrigger>
+              </TabsList>
+              <TabsContent value="edit">
+                <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
+              </TabsContent>
+              <TabsContent value="template">
+                <TemplateSelector
+                  templates={templates}
+                  selectedTemplate={selectedTemplate}
+                  onSelect={setSelectedTemplate}
+                />
+              </TabsContent>
+              <TabsContent value="export">
+                <AdPlaceholder adsWatched={adsWatched} onWatchAd={handleWatchAd} />
+              </TabsContent>
+            </Tabs>
         </div>
         <div className="lg:col-span-7 lg:sticky top-8">
           <ResumePreview resumeData={resumeData} template={selectedTemplate} adsWatched={adsWatched} />
