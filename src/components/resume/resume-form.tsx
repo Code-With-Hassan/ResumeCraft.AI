@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
@@ -12,14 +13,17 @@ import { Button } from "@/components/ui/button";
 import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { improveResumeContent } from "@/ai/flows/improve-resume-content";
+import { useAuth } from "@/lib/auth";
 
 interface ResumeFormProps {
   resumeData: ResumeData;
   setResumeData: Dispatch<SetStateAction<ResumeData>>;
+  adsWatched: number;
 }
 
-export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProps) {
+export default function ResumeForm({ resumeData, setResumeData, adsWatched }: ResumeFormProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isImproving, setIsImproving] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,6 +74,24 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
     type: 'experience' | 'education' | 'skills',
     index?: number
   ) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to use AI features.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (adsWatched < 3) {
+      toast({
+        title: "Unlock AI Features",
+        description: `Please watch ${3 - adsWatched} more ad(s) to use AI content improvement.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     let contentToImprove = '';
     const stateKey = type === 'skills' ? 'skills' : `${type}-${index}`;
     setIsImproving(stateKey);
@@ -165,6 +187,8 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
   const handleLoadClick = () => {
     fileInputRef.current?.click();
   };
+  
+  const canUseAi = user && adsWatched >= 3;
 
   return (
     <Card className="shadow-lg">
@@ -228,7 +252,7 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                     <div className="space-y-2 relative">
                       <Label>Description</Label>
                       <Textarea name="description" value={exp.description} onChange={(e) => handleExperienceChange(index, e)} rows={4} />
-                       <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('experience', index)} disabled={!!isImproving}>
+                       <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('experience', index)} disabled={!!isImproving || !canUseAi}>
                         {isImproving === `experience-${index}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Improve
                       </Button>
@@ -258,7 +282,7 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                      <div className="space-y-2 relative">
                       <Label>Details / Achievements</Label>
                       <Textarea name="details" value={edu.details} onChange={(e) => handleEducationChange(index, e)} rows={2} />
-                      <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('education', index)} disabled={!!isImproving}>
+                      <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('education', index)} disabled={!!isImproving || !canUseAi}>
                         {isImproving === `education-${index}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Improve
                       </Button>
@@ -280,7 +304,7 @@ export default function ResumeForm({ resumeData, setResumeData }: ResumeFormProp
                 <div className="space-y-2 relative">
                   <Label htmlFor="skills">Skills (comma-separated)</Label>
                   <Textarea id="skills" value={resumeData.skills} onChange={handleSkillsChange} rows={3} />
-                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('skills')} disabled={!!isImproving}>
+                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('skills')} disabled={!!isImproving || !canUseAi}>
                     {isImproving === 'skills' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Improve
                   </Button>

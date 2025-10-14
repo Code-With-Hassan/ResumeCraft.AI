@@ -10,6 +10,7 @@ import TemplateSelector from "@/components/resume/template-selector";
 import AdPlaceholder from "@/components/ad-placeholder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PenSquare, LayoutTemplate, Send } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const initialResumeData: ResumeData = {
   personal: {
@@ -57,6 +58,7 @@ export default function BuilderPage() {
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
   const [adsWatched, setAdsWatched] = useState(0);
+  const { user } = useAuth();
 
   const handleWatchAd = () => {
     if (adsWatched < 3) {
@@ -82,7 +84,11 @@ export default function BuilderPage() {
                 <TabsTrigger value="export"><Send className="mr-2 h-4 w-4"/> Export</TabsTrigger>
               </TabsList>
               <TabsContent value="edit">
-                <ResumeForm resumeData={resumeData} setResumeData={setResumeData} />
+                <ResumeForm 
+                  resumeData={resumeData} 
+                  setResumeData={setResumeData} 
+                  adsWatched={adsWatched} 
+                />
               </TabsContent>
               <TabsContent value="template">
                 <TemplateSelector

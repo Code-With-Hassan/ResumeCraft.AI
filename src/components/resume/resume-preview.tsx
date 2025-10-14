@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { ResumeData, Template, ATSCheckResult } from "@/lib/types";
@@ -80,6 +81,7 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
   const [isAtsLoading, setIsAtsLoading] = useState(false);
   const [isAtsDialogOpen, setIsAtsDialogOpen] = useState(false);
   
+  const canUseAi = user && adsWatched >= 3;
   const canDownloadPdf = user && adsWatched >= 3;
 
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
@@ -135,6 +137,24 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
   };
 
   const handleAtsCheck = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to use AI features.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (adsWatched < 3) {
+      toast({
+        title: "Unlock AI Features",
+        description: `Please watch ${3 - adsWatched} more ad(s) to use the ATS checker.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsAtsLoading(true);
     setAtsResult(null);
     try {
@@ -159,7 +179,7 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
               <CardDescription>Your resume is ready! Check ATS score or download.</CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleAtsCheck} disabled={isAtsLoading}>
+              <Button variant="outline" size="sm" onClick={handleAtsCheck} disabled={isAtsLoading || !canUseAi}>
                 {isAtsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
                 Check ATS
               </Button>
