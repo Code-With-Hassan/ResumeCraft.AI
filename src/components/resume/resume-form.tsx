@@ -10,21 +10,38 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload } from "lucide-react";
+import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload, Video } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { improveResumeContent } from "@/ai/flows/improve-resume-content";
 import { useAuth } from "@/lib/auth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ResumeFormProps {
   resumeData: ResumeData;
   setResumeData: Dispatch<SetStateAction<ResumeData>>;
-  adsWatched: number;
+  onWatchAd: () => void;
 }
 
-export default function ResumeForm({ resumeData, setResumeData, adsWatched }: ResumeFormProps) {
+type ImprovementRequest = {
+    type: 'experience' | 'education' | 'skills',
+    index?: number
+} | null;
+
+export default function ResumeForm({ resumeData, setResumeData, onWatchAd }: ResumeFormProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isImproving, setIsImproving] = useState<string | null>(null);
+  const [adDialogOpen, setAdDialogOpen] = useState(false);
+  const [currentImprovementRequest, setCurrentImprovementRequest] = useState<ImprovementRequest>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,10 +87,7 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
     setResumeData(prev => ({ ...prev, education: newEducation }));
   };
 
-  const handleImproveContent = async (
-    type: 'experience' | 'education' | 'skills',
-    index?: number
-  ) => {
+  const requestImprovement = (type: 'experience' | 'education' | 'skills', index?: number) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -83,15 +97,21 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
       return;
     }
 
-    if (adsWatched < 3) {
-      toast({
-        title: "Unlock AI Features",
-        description: `Please watch ${3 - adsWatched} more ad(s) to use AI content improvement.`,
-        variant: "destructive",
-      });
-      return;
-    }
+    setCurrentImprovementRequest({ type, index });
+    setAdDialogOpen(true);
+  };
+  
+  const handleConfirmWatchAd = () => {
+      if (currentImprovementRequest) {
+        onWatchAd();
+        handleImproveContent(currentImprovementRequest.type, currentImprovementRequest.index);
+      }
+  }
 
+  const handleImproveContent = async (
+    type: 'experience' | 'education' | 'skills',
+    index?: number
+  ) => {
     let contentToImprove = '';
     const stateKey = type === 'skills' ? 'skills' : `${type}-${index}`;
     setIsImproving(stateKey);
@@ -143,7 +163,7 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
       a.href = url;
       a.download = "resume-data.json";
       document.body.appendChild(a);
-      a.click();
+a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       toast({ title: 'Data Saved!', description: 'Your resume data has been saved as resume-data.json.' });
@@ -188,9 +208,10 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
     fileInputRef.current?.click();
   };
   
-  const canUseAi = user && adsWatched >= 3;
+  const canUseAi = !!user;
 
   return (
+    <>
     <Card className="shadow-lg">
       <CardHeader>
         <div className="flex justify-between items-center">
@@ -252,7 +273,7 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
                     <div className="space-y-2 relative">
                       <Label>Description</Label>
                       <Textarea name="description" value={exp.description} onChange={(e) => handleExperienceChange(index, e)} rows={4} />
-                       <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('experience', index)} disabled={!!isImproving || !canUseAi}>
+                       <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => requestImprovement('experience', index)} disabled={!!isImproving || !canUseAi}>
                         {isImproving === `experience-${index}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Improve
                       </Button>
@@ -282,7 +303,7 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
                      <div className="space-y-2 relative">
                       <Label>Details / Achievements</Label>
                       <Textarea name="details" value={edu.details} onChange={(e) => handleEducationChange(index, e)} rows={2} />
-                      <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('education', index)} disabled={!!isImproving || !canUseAi}>
+                      <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => requestImprovement('education', index)} disabled={!!isImproving || !canUseAi}>
                         {isImproving === `education-${index}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                         Improve
                       </Button>
@@ -304,7 +325,7 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
                 <div className="space-y-2 relative">
                   <Label htmlFor="skills">Skills (comma-separated)</Label>
                   <Textarea id="skills" value={resumeData.skills} onChange={handleSkillsChange} rows={3} />
-                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => handleImproveContent('skills')} disabled={!!isImproving || !canUseAi}>
+                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => requestImprovement('skills')} disabled={!!isImproving || !canUseAi}>
                     {isImproving === 'skills' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Improve
                   </Button>
@@ -315,5 +336,20 @@ export default function ResumeForm({ resumeData, setResumeData, adsWatched }: Re
         </Accordion>
       </CardContent>
     </Card>
+    <AlertDialog open={adDialogOpen} onOpenChange={setAdDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2"><Video /> Watch Ad to Improve</AlertDialogTitle>
+                <AlertDialogDescription>
+                    To use our AI content improvement feature, you need to watch a short rewarded ad. This helps us keep our basic AI tools free!
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setCurrentImprovementRequest(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmWatchAd}>Watch Ad & Improve</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

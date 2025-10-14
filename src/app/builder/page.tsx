@@ -87,7 +87,7 @@ export default function BuilderPage() {
                 <ResumeForm 
                   resumeData={resumeData} 
                   setResumeData={setResumeData} 
-                  adsWatched={adsWatched} 
+                  onWatchAd={handleWatchAd}
                 />
               </TabsContent>
               <TabsContent value="template">
