@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { checkResumeAgainstATS } from "@/ai/flows/check-resume-against-ats";
 import ATSCheckerDialog from "./ats-checker-dialog";
+import { useAuth } from "@/lib/auth";
 
 interface ResumePreviewProps {
   resumeData: ResumeData;
@@ -73,6 +74,7 @@ const fillTemplate = (template: string, data: ResumeData): string => {
 
 export default function ResumePreview({ resumeData, template }: ResumePreviewProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [atsResult, setAtsResult] = useState<ATSCheckResult>(null);
   const [isAtsLoading, setIsAtsLoading] = useState(false);
   const [isAtsDialogOpen, setIsAtsDialogOpen] = useState(false);
@@ -80,13 +82,26 @@ export default function ResumePreview({ resumeData, template }: ResumePreviewPro
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
 
   const handleDownload = (format: 'md' | 'pdf') => {
+    if (format === 'pdf' && !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to download your resume as a PDF.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (template.isPremium && format === 'pdf') {
       toast({
         title: "Premium Feature",
         description: "Downloading in PDF format is a premium feature. For now, you can download as Markdown.",
         variant: "destructive",
       });
-      return;
+      // In a real app, you might not return here if the user is premium.
+      // For mock purposes, we will prevent download.
+      if (!user?.isPremium) {
+        return;
+      }
     }
 
     if (format === 'md') {
@@ -99,6 +114,12 @@ export default function ResumePreview({ resumeData, template }: ResumePreviewPro
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    } else if (format === 'pdf') {
+      // PDF generation would happen here. For now, we'll just show a toast.
+       toast({
+        title: "PDF Download (Mock)",
+        description: "This would trigger a PDF download in a real application.",
+      });
     }
   };
 
