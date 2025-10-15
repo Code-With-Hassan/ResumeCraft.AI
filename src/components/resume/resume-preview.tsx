@@ -2,8 +2,7 @@
 "use client";
 
 import type { ResumeData, Template, ATSCheckResult } from "@/lib/types";
-import React, from "react";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, ShieldCheck, Loader2, Star } from "lucide-react";
@@ -14,6 +13,8 @@ import ATSCheckerDialog from "./ats-checker-dialog";
 import { useAuth } from "@/lib/auth";
 import { fillTemplate } from "@/lib/template-utils";
 import MarkdownRenderer from "./markdown-renderer";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 
 interface ResumePreviewProps {
@@ -27,14 +28,16 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
   const { user } = useAuth();
   const [atsResult, setAtsResult] = useState<ATSCheckResult>(null);
   const [isAtsLoading, setIsAtsLoading] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isAtsDialogOpen, setIsAtsDialogOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
   
   const canUseAi = user && adsWatched >= 3;
   const canDownloadPdf = user && adsWatched >= 3;
 
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
 
-  const handleDownload = (format: 'md' | 'pdf') => {
+  const handleDownload = async (format: 'md' | 'pdf') => {
     if (format === 'pdf' && !canDownloadPdf) {
       if(!user) {
         toast({
@@ -53,14 +56,12 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
     }
 
     if (template.isPremium && format === 'pdf') {
-      toast({
-        title: "Premium Feature",
-        description: "Downloading in PDF format is a premium feature. For now, you can download as Markdown.",
-        variant: "destructive",
-      });
-      // In a real app, you might not return here if the user is premium.
-      // For mock purposes, we will prevent download.
       if (!user?.isPremium) {
+        toast({
+            title: "Premium Feature",
+            description: "This template requires a premium account for PDF downloads.",
+            variant: "destructive",
+        });
         return;
       }
     }
@@ -76,11 +77,38 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     } else if (format === 'pdf') {
-      // PDF generation would happen here. For now, we'll just show a toast.
-       toast({
-        title: "PDF Download (Mock)",
-        description: "This would trigger a PDF download in a real application.",
-      });
+        if (!printRef.current) {
+            toast({
+                title: "Error",
+                description: "Could not find resume content to download.",
+                variant: "destructive",
+            });
+            return;
+        }
+        setIsPdfLoading(true);
+        try {
+            const canvas = await html2canvas(printRef.current, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.save('resume.pdf');
+
+        } catch (error) {
+            console.error("PDF generation failed:", error);
+            toast({
+                title: "PDF Generation Failed",
+                description: "An unexpected error occurred while creating the PDF.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsPdfLoading(false);
+        }
     }
   };
 
@@ -131,14 +159,15 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
                 {isAtsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ShieldCheck className="mr-2 h-4 w-4" />}
                 Check ATS
               </Button>
-              <Button size="sm" onClick={() => handleDownload('pdf')} className={cn(canDownloadPdf && "glow-on-hover")} disabled={!canDownloadPdf}>
-                <Download className="mr-2 h-4 w-4" /> PDF {template.isPremium && <Star className="ml-2 h-3 w-3 fill-amber-300 text-amber-500" />}
+              <Button size="sm" onClick={() => handleDownload('pdf')} className={cn(canDownloadPdf && "glow-on-hover")} disabled={!canDownloadPdf || isPdfLoading}>
+                {isPdfLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+                 PDF {template.isPremium && <Star className="ml-2 h-3 w-3 fill-amber-300 text-amber-500" />}
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="bg-card-foreground/5 rounded-b-lg p-6 md:p-8 shadow-inner overflow-y-auto" style={{minHeight: '800px'}}>
-          <div className="bg-white text-black p-8 rounded-md shadow-md">
+          <div ref={printRef} className="bg-white text-black p-8 rounded-md shadow-md">
             <MarkdownRenderer content={finalMarkdown} templateId={template.id} />
           </div>
         </CardContent>
