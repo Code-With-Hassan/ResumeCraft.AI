@@ -40,7 +40,8 @@ export default function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { user, loading, logout } = useAuth();
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | null) => {
+    if (!name) return '';
     return name.split(' ').map(n => n[0]).join('');
   }
 
