@@ -4,6 +4,7 @@ import { boldAccentTemplate } from './templates/bold-accent';
 import { corporateTemplate } from './templates/corporate';
 import { creativeTemplate } from './templates/creative';
 import { professionalTemplate } from './templates/professional';
+import { wayneTemplate } from './templates/wayne';
 
 export const templates: Template[] = [
   classicTemplate,
@@ -11,4 +12,5 @@ export const templates: Template[] = [
   corporateTemplate,
   creativeTemplate,
   professionalTemplate,
+  wayneTemplate,
 ];
