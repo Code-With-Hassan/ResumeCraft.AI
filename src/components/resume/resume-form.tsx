@@ -3,14 +3,14 @@
 
 import type { Dispatch, SetStateAction } from "react";
 import type { ResumeData, Experience, Education } from "@/lib/types";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload, Video } from "lucide-react";
+import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload, Video, Cloud } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { improveResumeContent } from "@/ai/flows/improve-resume-content";
 import { useAuth } from "@/lib/auth";
@@ -25,6 +25,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AdFactory } from "@/lib/ads/AdFactory";
+import { firestore } from "@/lib/firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+
 
 interface ResumeFormProps {
   resumeData: ResumeData;
@@ -42,9 +45,28 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
   const { toast } = useToast();
   const { user } = useAuth();
   const [isImproving, setIsImproving] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [adDialogOpen, setAdDialogOpen] = useState(false);
   const [currentImprovementRequest, setCurrentImprovementRequest] = useState<ImprovementRequest>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const loadResumeFromFirestore = async () => {
+      if (user) {
+        const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setResumeData(docSnap.data() as ResumeData);
+           toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded from the cloud.' });
+        } else {
+          console.log("No such document!");
+        }
+      }
+    };
+
+    loadResumeFromFirestore();
+  }, [user, setResumeData, toast]);
+
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -180,58 +202,22 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
     }
   };
 
-  const handleSaveData = () => {
+  const saveResumeToFirestore = async () => {
+    if (!user) {
+      toast({ title: 'Authentication Required', description: 'Please log in to save your data.', variant: 'destructive' });
+      return;
+    }
+    setIsSaving(true);
     try {
-      const jsonString = JSON.stringify(resumeData, null, 2);
-      const blob = new Blob([jsonString], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resume-data.json";
-      document.body.appendChild(a);
-a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast({ title: 'Data Saved!', description: 'Your resume data has been saved as resume-data.json.' });
+      const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
+      await setDoc(docRef, resumeData);
+      toast({ title: 'Data Saved!', description: 'Your resume data has been saved to the cloud.' });
     } catch (error) {
       console.error("Failed to save data", error);
       toast({ title: 'Error', description: 'Could not save resume data.', variant: 'destructive' });
+    } finally {
+      setIsSaving(false);
     }
-  };
-
-  const handleLoadData = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result;
-        if (typeof text === 'string') {
-          const loadedData = JSON.parse(text);
-          // Basic validation to ensure the loaded data has the expected structure
-          if (loadedData.personal && loadedData.experience && loadedData.education && loadedData.skills !== undefined) {
-            setResumeData(loadedData);
-            toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded successfully.' });
-          } else {
-            throw new Error("Invalid JSON structure.");
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load or parse data", error);
-        toast({ title: 'Error Loading Data', description: 'The selected file is not a valid resume JSON file.', variant: 'destructive' });
-      }
-    };
-    reader.readAsText(file);
-    
-    // Reset file input value to allow loading the same file again
-    if(fileInputRef.current) {
-        fileInputRef.current.value = "";
-    }
-  };
-
-  const handleLoadClick = () => {
-    fileInputRef.current?.click();
   };
   
   const canUseAi = !!user;
@@ -250,15 +236,10 @@ a.click();
               </CardDescription>
             </div>
             <div className="flex gap-2">
-                <Button variant="outline" onClick={handleSaveData}><Save className="mr-2 h-4 w-4" />Save</Button>
-                <Button variant="outline" onClick={handleLoadClick}><Upload className="mr-2 h-4 w-4" />Load</Button>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleLoadData}
-                    accept="application/json"
-                    className="hidden"
-                />
+                <Button variant="outline" onClick={saveResumeToFirestore} disabled={isSaving || !user}>
+                    {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Cloud className="mr-2 h-4 w-4" />}
+                    Save to Cloud
+                </Button>
             </div>
         </div>
       </CardHeader>

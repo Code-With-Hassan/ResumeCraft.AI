@@ -1,12 +1,22 @@
 'use client';
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import {
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  User as FirebaseUser,
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { useToast } from '@/hooks/use-toast';
 
 // Define the user type
 interface User {
   uid: string;
-  email: string;
-  name: string;
+  email: string | null;
+  name: string | null;
   isPremium?: boolean;
 }
 
@@ -26,82 +36,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Mock a logged in user
   useEffect(() => {
-    // In a real app, you'd check for a token in localStorage or a cookie
-    const storedUser = localStorage.getItem('mockUser');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName,
+          // In a real app, you might fetch premium status from your database
+          isPremium: firebaseUser.email === 'test@example.com' 
+        });
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const login = async (email: string, pass: string) => {
-    setLoading(true);
-    // Mock API call
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (email === 'test@example.com' && pass === 'password') {
-          const mockUser: User = {
-            uid: '12345',
-            email: 'test@example.com',
-            name: 'Test User',
-            isPremium: true // Mock premium status
-          };
-          setUser(mockUser);
-          localStorage.setItem('mockUser', JSON.stringify(mockUser));
-          setLoading(false);
-          resolve();
-        } else if (email === 'user@example.com' && pass === 'password') {
-           const mockUser: User = {
-            uid: '67890',
-            email: 'user@example.com',
-            name: 'Normal User',
-            isPremium: false
-          };
-          setUser(mockUser);
-          localStorage.setItem('mockUser', JSON.stringify(mockUser));
-          setLoading(false);
-          resolve();
-        } else {
-          setLoading(false);
-          reject(new Error('Invalid email or password'));
-        }
-      }, 1000);
-    });
+    await signInWithEmailAndPassword(auth, email, pass);
   };
   
   const signup = async (name: string, email: string, pass: string) => {
-     setLoading(true);
-    // Mock API call
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        // For mock purposes, signup is always successful unless the user exists
-        if (email === 'test@example.com' || email === 'user@example.com') {
-          setLoading(false);
-          reject(new Error('An account with this email already exists.'));
-        } else {
-          // We don't log in the user, just create the "account"
-          console.log(`Mock signup for ${name} with email ${email}`);
-          setLoading(false);
-          resolve();
-        }
-      }, 1000);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+    }
+    // Update user state immediately after signup for better UX
+     setUser({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        name: name,
+        isPremium: false,
     });
   };
 
 
   const logout = async () => {
-    setLoading(true);
-     return new Promise<void>(resolve => {
-      setTimeout(() => {
-        setUser(null);
-        localStorage.removeItem('mockUser');
-        setLoading(false);
-        resolve();
-      }, 500);
-    });
+    await signOut(auth);
   };
 
   const value = {
