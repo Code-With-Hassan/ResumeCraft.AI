@@ -4,25 +4,25 @@
 
 @layer base {
   :root {
-    --background: 224 71.4% 4.1%;
+    --background: 220 20% 5%;
     --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
+    --card: 220 20% 10%;
     --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
+    --popover: 220 20% 5%;
     --popover-foreground: 210 20% 98%;
-    --primary: 180 100% 50%;
-    --primary-foreground: 224 71.4% 4.1%;
-    --secondary: 215 27.9% 16.9%;
+    --primary: 190 95% 55%;
+    --primary-foreground: 210 20% 5%;
+    --secondary: 220 20% 15%;
     --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 300 100% 50%;
+    --muted: 220 20% 15%;
+    --muted-foreground: 210 20% 65%;
+    --accent: 270 95% 65%;
     --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 180 100% 50%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 20% 15%;
+    --input: 220 20% 15%;
+    --ring: 190 95% 60%;
     --radius: 0.5rem;
   }
 
@@ -33,19 +33,19 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 180 100% 40%;
+    --primary: 190 95% 45%;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 300 90% 96%;
+    --accent: 270 90% 96%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 180 100% 40%;
+    --ring: 190 95% 45%;
   }
 }
 
@@ -69,6 +69,6 @@
     box-shadow: 0 0 15px 1px hsl(var(--primary) / 0.4);
   }
   .glow {
-    box-shadow: 0 0 15px 1px hsl(var(--primary) / 0.4);
+    box-shadow: 0 0 20px 3px hsl(var(--primary) / 0.3);
   }
 }

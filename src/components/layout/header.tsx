@@ -27,7 +27,7 @@ const NavLink = ({ href, label, onClick }: { href: string; label: string, onClic
       href={href}
       onClick={onClick}
       className={cn(
-        'transition-colors text-foreground/60 hover:text-foreground/80',
+        'transition-colors text-muted-foreground hover:text-foreground',
         isActive && 'text-primary font-semibold'
       )}
     >
@@ -42,18 +42,18 @@ export default function Header() {
 
   const getInitials = (name: string | null) => {
     if (!name) return '';
-    return name.split(' ').map(n => n[0]).join('');
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   }
 
   return (
-    <header className="py-4 px-4 md:px-8 border-b border-primary/20 bg-background/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="py-4 px-4 md:px-8 border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
         <Link
           href="/"
           className="flex items-center gap-3 text-2xl font-bold font-headline transition-opacity hover:opacity-80"
         >
-          <div className="p-2 bg-primary rounded-lg glow">
-            <FileText className="text-primary-foreground h-6 w-6" />
+          <div className="p-2 bg-primary text-primary-foreground rounded-lg glow">
+            <FileText className="h-6 w-6" />
           </div>
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
             ResumeCraft AI
@@ -69,7 +69,7 @@ export default function Header() {
               <>
                  <span className="text-sm font-medium">Welcome, {user.name}!</span>
                  <Avatar className="h-9 w-9">
-                   <AvatarFallback className="bg-primary/30 font-bold">{getInitials(user.name)}</AvatarFallback>
+                   <AvatarFallback className="bg-primary/20 font-bold">{getInitials(user.name)}</AvatarFallback>
                  </Avatar>
                 <Button variant="ghost" onClick={logout} size="icon" aria-label="Log out">
                   <LogOut className="h-5 w-5" />
@@ -103,7 +103,7 @@ export default function Header() {
                     <>
                       <div className="flex items-center gap-3">
                          <Avatar>
-                           <AvatarFallback className="bg-primary/30 font-bold">{getInitials(user.name)}</AvatarFallback>
+                           <AvatarFallback className="bg-primary/20 font-bold">{getInitials(user.name)}</AvatarFallback>
                          </Avatar>
                          <span className="font-semibold">{user.name}</span>
                       </div>

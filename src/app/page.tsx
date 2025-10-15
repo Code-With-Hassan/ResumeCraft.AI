@@ -65,6 +65,7 @@ export default function Home() {
   return (
     <div className="space-y-24 md:space-y-32">
       <section className="text-center pt-12 md:pt-20">
+        <div className="absolute inset-0 top-0 h-[400px] bg-gradient-to-b from-primary/10 to-background -z-10"></div>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
           Engineer Your Career&apos;s Future
         </h1>
@@ -83,7 +84,7 @@ export default function Home() {
       <section>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="bg-secondary/50 border-primary/20 hover:border-primary/50 transition-colors duration-300">
+            <Card key={index} className="bg-card border-border hover:border-primary/50 transition-colors duration-300 transform hover:-translate-y-1">
               <CardHeader className="flex flex-row items-center gap-4">
                 {feature.icon}
                 <CardTitle>{feature.title}</CardTitle>
@@ -104,7 +105,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="flex flex-col items-center text-center p-4">
-              <div className="mb-4 p-4 bg-primary/20 rounded-full glow">{step.icon}</div>
+              <div className="mb-4 p-4 bg-primary/10 rounded-full glow">{step.icon}</div>
               <h3 className="text-2xl font-bold mb-2">{step.title}</h3>
               <p className="text-muted-foreground">{step.description}</p>
             </div>
@@ -119,11 +120,11 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-            <Card key={index} className="bg-secondary/50 border-primary/20">
+            <Card key={index} className="bg-card border-border">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                     <Avatar>
-                        <AvatarFallback className="bg-primary/30 font-bold">{testimonial.avatar}</AvatarFallback>
+                        <AvatarFallback className="bg-primary/20 font-bold">{testimonial.avatar}</AvatarFallback>
                     </Avatar>
                     <div>
                         <p className="font-semibold">{testimonial.name}</p>
@@ -142,7 +143,7 @@ export default function Home() {
         </div>
       </section>
       
-      <section className="text-center py-16 bg-secondary/30 rounded-lg">
+      <section className="text-center py-16 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tighter mb-4">Ready to Launch Your Career?</h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Don't let your resume get lost in the pile. Build a resume that demands attention.

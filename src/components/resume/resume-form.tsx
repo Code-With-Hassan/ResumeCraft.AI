@@ -240,7 +240,7 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
 
   return (
     <>
-    <Card className="shadow-lg">
+    <Card className="shadow-lg bg-card">
       <CardHeader>
         <div className="flex justify-between items-center">
             <div>
@@ -262,13 +262,13 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
       <CardContent>
         <Accordion type="multiple" defaultValue={['personal-info']} className="w-full space-y-4">
           
-          <AccordionItem value="personal-info" className="border rounded-lg overflow-hidden">
-             <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
+          <AccordionItem value="personal-info" className="border-none">
+             <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-primary" /> Personal Information
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-2 space-y-4">
+              <AccordionContent className="p-4 pt-2 mt-2 bg-secondary/20 rounded-lg space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2"><Label htmlFor="name">Full Name</Label><Input id="name" name="name" value={resumeData.personal.name} onChange={handlePersonalInfoChange} /></div>
                   <div className="space-y-2"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" value={resumeData.personal.email} onChange={handlePersonalInfoChange} /></div>
@@ -278,15 +278,15 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
               </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="experience" className="border-b-0 border rounded-lg overflow-hidden">
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
+          <AccordionItem value="experience" className="border-none">
+              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Briefcase className="h-5 w-5 text-primary" /> Work Experience
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-2 space-y-6">
+              <AccordionContent className="p-4 pt-2 mt-2 bg-secondary/20 rounded-lg space-y-6">
                 {resumeData.experience.map((exp, index) => (
-                  <div key={index} className="space-y-4 p-4 border rounded-lg relative bg-background/50">
+                  <div key={index} className="space-y-4 p-4 border border-border rounded-lg relative bg-background/50">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2"><Label>Title</Label><Input name="title" value={exp.title} onChange={(e) => handleExperienceChange(index, e)} /></div>
                       <div className="space-y-2"><Label>Company</Label><Input name="company" value={exp.company} onChange={(e) => handleExperienceChange(index, e)} /></div>
@@ -308,15 +308,15 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
               </AccordionContent>
           </AccordionItem>
           
-          <AccordionItem value="education" className="border-b-0 border rounded-lg overflow-hidden">
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
+          <AccordionItem value="education" className="border-none">
+              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <GraduationCap className="h-5 w-5 text-primary" /> Education
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-2 space-y-6">
+              <AccordionContent className="p-4 pt-2 mt-2 bg-secondary/20 rounded-lg space-y-6">
                  {resumeData.education.map((edu, index) => (
-                  <div key={index} className="space-y-4 p-4 border rounded-lg relative bg-background/50">
+                  <div key={index} className="space-y-4 p-4 border border-border rounded-lg relative bg-background/50">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2"><Label>Institution</Label><Input name="institution" value={edu.institution} onChange={(e) => handleEducationChange(index, e)} /></div>
                       <div className="space-y-2"><Label>Degree</Label><Input name="degree" value={edu.degree} onChange={(e) => handleEducationChange(index, e)} /></div>
@@ -338,13 +338,13 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
               </AccordionContent>
           </AccordionItem>
 
-          <AccordionItem value="skills" className="border-b-0 border rounded-lg overflow-hidden">
-              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50">
+          <AccordionItem value="skills" className="border-none">
+              <AccordionTrigger className="text-lg p-4 font-semibold hover:no-underline bg-secondary/50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <Wrench className="h-5 w-5 text-primary" /> Skills
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-2 space-y-4">
+              <AccordionContent className="p-4 pt-2 mt-2 bg-secondary/20 rounded-lg space-y-4">
                 <div className="space-y-2 relative">
                   <Label htmlFor="skills">Skills (comma-separated)</Label>
                   <Textarea id="skills" value={resumeData.skills} onChange={handleSkillsChange} rows={3} />
