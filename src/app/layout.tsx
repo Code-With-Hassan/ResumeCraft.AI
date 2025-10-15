@@ -6,6 +6,8 @@ import Footer from '@/components/layout/footer';
 import { AuthProvider } from '@/lib/auth';
 import { fontBody, fontHeadline } from '@/app/fonts';
 import { cn } from '@/lib/utils';
+import FirebaseErrorListener from '@/components/firebase/FirebaseErrorListener';
+
 
 export const metadata: Metadata = {
   title: 'ResumeCraft AI - Build Your Perfect Resume',
@@ -22,6 +24,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={cn("font-body antialiased bg-background text-foreground", fontHeadline.variable, fontBody.variable)}>
         <AuthProvider>
+          <FirebaseErrorListener />
           <Header />
           <main className="flex-1 w-full container mx-auto p-4 md:p-8">
             {children}

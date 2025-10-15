@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
@@ -27,6 +28,8 @@ import {
 import { AdFactory } from "@/lib/ads/AdFactory";
 import { firestore } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 
 interface ResumeFormProps {
@@ -53,14 +56,20 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
     const loadResumeFromFirestore = async () => {
       if (user) {
         const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setResumeData(docSnap.data() as ResumeData);
-           toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded from the cloud.' });
-        } else {
-          console.log("No such document!");
-        }
+        getDoc(docRef).then(docSnap => {
+            if (docSnap.exists()) {
+              setResumeData(docSnap.data() as ResumeData);
+               toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded from the cloud.' });
+            } else {
+              console.log("No such document!");
+            }
+        }).catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: docRef.path,
+                operation: 'get',
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
       }
     };
 
@@ -208,16 +217,23 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
       return;
     }
     setIsSaving(true);
-    try {
-      const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
-      await setDoc(docRef, resumeData);
-      toast({ title: 'Data Saved!', description: 'Your resume data has been saved to the cloud.' });
-    } catch (error) {
-      console.error("Failed to save data", error);
-      toast({ title: 'Error', description: 'Could not save resume data.', variant: 'destructive' });
-    } finally {
-      setIsSaving(false);
-    }
+    const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
+    
+    setDoc(docRef, resumeData)
+      .then(() => {
+        toast({ title: 'Data Saved!', description: 'Your resume data has been saved to the cloud.' });
+      })
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'create', // or 'update' depending on your logic
+          requestResourceData: resumeData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setIsSaving(false);
+      });
   };
   
   const canUseAi = !!user;
