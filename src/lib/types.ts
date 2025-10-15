@@ -33,6 +33,7 @@ export interface Template {
   name: string;
   isPremium: boolean;
   markdown: string;
+  style?: string;
 }
 
 export type ATSCheckResult = {

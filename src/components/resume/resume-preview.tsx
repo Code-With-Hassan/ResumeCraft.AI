@@ -168,7 +168,7 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
         </CardHeader>
         <CardContent className="bg-card-foreground/5 rounded-b-lg p-6 md:p-8 shadow-inner overflow-y-auto" style={{minHeight: '800px'}}>
           <div ref={printRef} className="bg-white text-black p-8 rounded-md shadow-md">
-            <MarkdownRenderer content={finalMarkdown} templateId={template.id} />
+            <MarkdownRenderer content={finalMarkdown} templateId={template.id} className={template.style} />
           </div>
         </CardContent>
       </Card>

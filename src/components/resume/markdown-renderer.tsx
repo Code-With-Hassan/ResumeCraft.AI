@@ -5,11 +5,12 @@ import { cn } from "@/lib/utils";
 interface MarkdownRendererProps {
   content: string;
   templateId: string;
+  className?: string;
 }
 
-export default function MarkdownRenderer({ content, templateId }: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, templateId, className }: MarkdownRendererProps) {
   return (
-    <div className={cn("prose prose-sm dark:prose-invert max-w-none", templateId === "bold-accent" && "prose-headings:text-primary")}>
+    <div className={cn("prose prose-sm dark:prose-invert max-w-none", className)}>
       {content.split('\n').map((line, index) => {
         if (line.trim() === '') return null;
         if (line.startsWith('### ')) return <h3 key={index} className="text-lg font-semibold mb-1 mt-3">{line.substring(4).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')}</h3>;
