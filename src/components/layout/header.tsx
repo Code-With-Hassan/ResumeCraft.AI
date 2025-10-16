@@ -7,7 +7,7 @@ import { FileText, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -19,7 +19,6 @@ const navLinks = [
   { href: '/pricing', label: 'Pricing' },
   { href: '/contact', label: 'Contact Us' },
   { href: '/builder', label: 'Builder' },
-  { href: '/admin', label: 'Admin' },
 ];
 
 const NavLink = ({ href, label, onClick }: { href: string; label: string, onClick?: () => void }) => {
@@ -43,6 +42,18 @@ export default function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      user.getIdTokenResult().then((idTokenResult) => {
+        const isAdminClaim = !!idTokenResult.claims.admin;
+        setIsAdmin(isAdminClaim);
+      });
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
 
   const logout = async () => {
     await signOut(auth);
@@ -52,6 +63,8 @@ export default function Header() {
     if (!name) return '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   }
+
+  const allNavLinks = isAdmin ? [...navLinks, { href: '/admin', label: 'Admin' }] : navLinks;
 
   return (
     <header className="py-4 px-4 md:px-8 border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
@@ -68,7 +81,7 @@ export default function Header() {
           </span>
         </Link>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          {navLinks.map(link => (
+          {allNavLinks.map(link => (
             <NavLink key={link.href} {...link} />
           ))}
         </nav>
@@ -103,7 +116,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="right">
               <nav className="flex flex-col gap-6 mt-8">
-                {navLinks.map(link => (
+                {allNavLinks.map(link => (
                   <NavLink key={link.href} {...link} onClick={() => setIsSheetOpen(false)}/>
                 ))}
                  <div className="flex flex-col gap-4 mt-4 border-t pt-6">

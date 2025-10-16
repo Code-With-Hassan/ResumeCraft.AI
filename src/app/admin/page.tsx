@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, FormEvent, useMemo } from 'react';
+import { useState, FormEvent, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useUser, useFirestore, useCollection, WithId, useMemoFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { ShieldAlert } from 'lucide-react';
 
 
 type BlogPost = {
@@ -22,10 +23,28 @@ type BlogPost = {
 type BlogPostWithId = WithId<BlogPost>;
 
 export default function AdminPage() {
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
   const [newPost, setNewPost] = useState({ title: '', content: '' });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
+
+  useEffect(() => {
+    if (isUserLoading) {
+      return;
+    }
+    if (user) {
+      user.getIdTokenResult().then((idTokenResult) => {
+        const isAdminClaim = !!idTokenResult.claims.admin;
+        setIsAdmin(isAdminClaim);
+        setIsCheckingAdmin(false);
+      });
+    } else {
+      setIsAdmin(false);
+      setIsCheckingAdmin(false);
+    }
+  }, [user, isUserLoading]);
 
   const blogPostsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -45,10 +64,10 @@ export default function AdminPage() {
       return;
     }
 
-    if (!user) {
+    if (!user || !isAdmin) {
       toast({
-        title: 'Authentication Error',
-        description: 'You must be logged in to create a post.',
+        title: 'Authorization Error',
+        description: 'You do not have permission to create a post.',
         variant: 'destructive',
       });
       return;
@@ -86,6 +105,26 @@ export default function AdminPage() {
       });
     }
   };
+
+  if (isCheckingAdmin || isUserLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <p>Loading admin panel...</p>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+     return (
+      <div className="text-center py-16">
+        <ShieldAlert className="mx-auto h-16 w-16 text-destructive" />
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mt-4">Access Denied</h1>
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mt-2">
+          You do not have the necessary permissions to view this page.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-12">
