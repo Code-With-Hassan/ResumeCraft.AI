@@ -6,8 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { firestore } from '@/lib/firebase';
-import { useCollection, WithId } from '@/firebase';
+import { useCollection, WithId, useFirestore, useMemoFirebase } from '@/firebase';
 
 type BlogPost = {
   title: string;
@@ -18,10 +17,12 @@ type BlogPost = {
 type BlogPostWithId = WithId<BlogPost>;
 
 export default function BlogsPage() {
-  const blogPostsQuery = useMemo(() => {
+  const firestore = useFirestore();
+
+  const blogPostsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'blogPosts'), orderBy('createdAt', 'desc'));
-  }, []);
+  }, [firestore]);
 
   const { data: blogPosts, isLoading } = useCollection<BlogPost>(blogPostsQuery);
 

@@ -8,10 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/lib/auth';
+import { useUser, useFirestore, useCollection, WithId, useMemoFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp, query, orderBy } from 'firebase/firestore';
-import { firestore } from '@/lib/firebase';
-import { useCollection, WithId } from '@/firebase';
+
 
 type BlogPost = {
   title: string;
@@ -23,14 +22,15 @@ type BlogPost = {
 type BlogPostWithId = WithId<BlogPost>;
 
 export default function AdminPage() {
-  const { user } = useAuth();
+  const { user } = useUser();
+  const firestore = useFirestore();
   const { toast } = useToast();
   const [newPost, setNewPost] = useState({ title: '', content: '' });
 
-  const blogPostsQuery = useMemo(() => {
+  const blogPostsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'blogPosts'), orderBy('createdAt', 'desc'));
-  }, []);
+  }, [firestore]);
 
   const { data: blogPosts, isLoading } = useCollection<BlogPost>(blogPostsQuery);
 
@@ -49,6 +49,15 @@ export default function AdminPage() {
       toast({
         title: 'Authentication Error',
         description: 'You must be logged in to create a post.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!firestore) {
+       toast({
+        title: 'Database Error',
+        description: 'Firestore is not available.',
         variant: 'destructive',
       });
       return;
