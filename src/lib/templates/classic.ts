@@ -12,8 +12,7 @@ export const classicTemplate: Template = {
 
 ---
 
-## Summary
-> {{summary}}
+-> {{summary}}
 
 ---
 
