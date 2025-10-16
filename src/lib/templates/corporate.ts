@@ -5,7 +5,7 @@ export const corporateTemplate: Template = {
   id: 'corporate',
   name: 'Corporate',
   isPremium: false,
-  style: 'prose-h2:text-2xl prose-h2:text-center prose-h3:font-bold prose-h3:uppercase prose-h3:tracking-wider prose-h3:text-base prose-hr:my-3 prose-p:my-1',
+  style: 'prose-h2:text-2xl prose-h2:text-center prose-h3:font-bold prose-h3:uppercase prose-h3:tracking-wider prose-h3:text-base prose-hr:my-3',
   markdown: `
 ## {{name}}
 {{email}} | {{phone}} | {{website}}
