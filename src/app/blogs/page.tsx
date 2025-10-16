@@ -27,7 +27,7 @@ export default function BlogsPage() {
   const { data: blogPosts, isLoading } = useCollection<BlogPost>(blogPostsQuery);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       <section className="text-center">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-4">From Our Data Core</h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">

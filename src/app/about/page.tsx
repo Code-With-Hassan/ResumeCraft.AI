@@ -3,7 +3,7 @@ import { Users, Target, Code } from 'lucide-react';
 
 export default function AboutPage() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       <section className="text-center">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tighter mb-4">About ResumeCraft AI</h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">

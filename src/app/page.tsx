@@ -63,7 +63,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-24 md:space-y-32">
+    <div className="space-y-16 md:space-y-20">
       <section className="text-center pt-12 md:pt-20">
         <div className="absolute inset-0 top-0 h-[400px] bg-gradient-to-b from-primary/10 to-background -z-10"></div>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
