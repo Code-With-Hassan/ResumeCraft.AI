@@ -1,75 +1,95 @@
 /**
- * @file Firestore Security Rules
- * @corePhilosophy This ruleset enforces a strict user-ownership model. Each user has full control over their own data tree, and no user can access another user's data.
- * @dataStructure All data is nested under /users/{userId}, ensuring clear ownership.  User profiles are stored directly at /users/{userId}, and each user's blog posts are stored in a subcollection /users/{userId}/blogPosts/{blogPostId}.
- * @keySecurityDecisions User listing is disallowed for privacy.  Writes to a user's data tree are only permitted if the authenticated user's ID matches the userId in the path, enforcing ownership. The rules are written to avoid any `get()` calls for authorization, ensuring efficiency and preventing cascading failures.
- * @denormalizationForAuthorization Not needed. The user-post relationship is enforced by the hierarchical data model itself.
- * @structuralSegregation Not applicable. The separation between private user data and potentially public blog post content is achieved through the user-scoping of blog posts.
+ * @fileoverview Firestore Security Rules for ResumeCraft AI.
+ *
+ * Core Philosophy:
+ * This ruleset employs a hybrid security model. User data (profiles and resumes)
+ * is strictly controlled by ownership. Blog posts are publicly readable but
+ * require authentication and proper ownership for creation, updates, and deletions.
+ *
+ * Data Structure:
+ * - /users/{userId}: User profile information.
+ * - /users/{userId}/resumes/{resumeId}:  A user's resume documents.
+ * - /blogPosts/{blogPostId}: Publicly accessible blog posts.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed.
+ * - Blog posts are publicly readable.
+ * - Write operations on blog posts are restricted to the author.
+ *
+ * Denormalization for Authorization:
+ * - Blog posts contain an `authorId` field to simplify ownership checks.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profiles.
+     * @description Controls access to user profile documents.
      * @path /users/{userId}
-     * @allow (create) - A user with UID 'user_abc' can create their own profile at /users/user_abc.
-     * @allow (get, update, delete) - A user with UID 'user_abc' can read, update, and delete their own profile at /users/user_abc.
-     * @deny (create) - A user with UID 'user_abc' cannot create a profile at /users/user_xyz.
-     * @deny (get, update, delete) - A user with UID 'user_abc' cannot read, update, or delete the profile at /users/user_xyz.
-     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.  Allows self-creation.
+     * @allow (create) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' can create their own profile.
+     * @deny (create) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' cannot create a profile with a different ID.
+     * @allow (get, list) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' can read their own profile.
+     * @deny (get, list) User 'randomId' cannot read the profile of 'DDVOEvhquuRfeYwJI2JTOoN2XE33'.
+     * @allow (update, delete) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' can update/delete their own profile.
+     * @deny (update, delete) User 'randomId' cannot update/delete the profile of 'DDVOEvhquuRfeYwJI2JTOoN2XE33'.
+     * @principle Enforces user-ownership for profile data.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if false; // User listing is disallowed for privacy
-      allow create: if isOwner(userId) && request.auth.uid == userId;
-      allow update: if isExistingOwner(userId) && request.auth.uid == userId;
-      allow delete: if isExistingOwner(userId) && request.auth.uid == userId;
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
     }
 
     /**
-     * @description Controls access to blog posts created by a user.
-     * @path /users/{userId}/blogPosts/{blogPostId}
-     * @allow (create) - A user with UID 'user_abc' can create a blog post under /users/user_abc/blogPosts/post_123.
-     * @allow (get, list, update, delete) - A user with UID 'user_abc' can read, list, update, and delete their own blog posts under /users/user_abc/blogPosts/.
-     * @deny (create) - A user with UID 'user_abc' cannot create a blog post under /users/user_xyz/blogPosts/post_123.
-     * @deny (get, list, update, delete) - A user with UID 'user_abc' cannot read, list, update, or delete blog posts under /users/user_xyz/blogPosts/.
-     * @principle Enforces document ownership for writes and restricts access to a user's own data tree.
+     * @description Controls access to a user's resume documents.
+     * @path /users/{userId}/resumes/{resumeId}
+     * @allow (create) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' can create a resume in their own profile.
+     * @deny (create) User 'randomId' cannot create a resume in 'DDVOEvhquuRfeYwJI2JTOoN2XE33' profile.
+     * @allow (get, list) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' can read their own resumes.
+     * @deny (get, list) User 'randomId' cannot read the resumes of 'DDVOEvhquuRfeYwJI2JTOoN2XE33'.
+     * @allow (update, delete) User 'DDVOEvhquuRfeYwJI2JTOoN2XE33' can update/delete their own resumes.
+     * @deny (update, delete) User 'randomId' cannot update/delete the resumes of 'DDVOEvhquuRfeYwJI2JTOoN2XE33'.
+     * @principle Enforces user-ownership for resume data.
      */
-    match /users/{userId}/blogPosts/{blogPostId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    // --- Helper functions ---
-
-    /**
-     * @description Checks if the request is made by the owner of the resource.
-     * @param {string} userId The user ID to check against the request's authentication UID.
-     * @return {bool} True if the request is made by the owner, false otherwise.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    match /users/{userId}/resumes/{resumeId} {
+      allow create: if isSignedIn() && isOwner(userId);
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isExistingOwner(userId);
+      allow delete: if isSignedIn() && isExistingOwner(userId);
     }
 
     /**
-     * @description Checks if the user is signed in.
-     * @return {bool} True if the user is signed in, false otherwise.
+     * @description Controls access to blog post documents.
+     * @path /blogPosts/{blogPostId}
+     * @allow (create) Any signed-in user can create a blog post if the authorId matches their UID.
+     * @deny (create) A signed-in user cannot create a blog post with an authorId that doesn't match their UID.
+     * @allow (get, list) Anyone can read (get, list) blog posts.
+     * @allow (update, delete) Only the author of a blog post can update or delete it.
+     * @deny (update, delete) A user who is not the author cannot update or delete a blog post.
+     * @principle Allows public reads but restricts writes to the author.
      */
-    function isSignedIn() {
-      return request.auth != null;
+    match /blogPosts/{blogPostId} {
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow get: if true;
+      allow list: if true;
+      allow update: if isSignedIn() && isExistingOwner(resource.data.authorId);
+      allow delete: if isSignedIn() && isExistingOwner(resource.data.authorId);
     }
+  }
 
-    /**
-     * @description Checks if the request is made by the existing owner of the resource.
-     * @param {string} userId The user ID to check against the resource's data.
-     * @return {bool} True if the request is made by the owner and the resource exists, false otherwise.
-     */
-    function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-    }
+  // Helper functions
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  function isOwner(userId) {
+    return request.auth.uid == userId;
+  }
+
+  function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
   }
 }
