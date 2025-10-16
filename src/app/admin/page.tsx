@@ -1,30 +1,42 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import blogPostsData from '@/lib/blog-posts.json';
+import { useAuth } from '@/lib/auth';
+import { addDoc, collection, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
+import { useCollection, WithId } from '@/firebase';
 
 type BlogPost = {
-  id: number;
   title: string;
-  date: string;
-  excerpt: string;
+  content: string;
+  authorId: string;
+  createdAt: any;
 };
 
-export default function AdminPage() {
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(blogPostsData.posts);
-  const [newPost, setNewPost] = useState({ title: '', excerpt: '' });
-  const { toast } = useToast();
+type BlogPostWithId = WithId<BlogPost>;
 
-  const handleAddBlog = (e: React.FormEvent) => {
+export default function AdminPage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [newPost, setNewPost] = useState({ title: '', content: '' });
+
+  const blogPostsQuery = useMemo(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'blogPosts'), orderBy('createdAt', 'desc'));
+  }, []);
+
+  const { data: blogPosts, isLoading } = useCollection<BlogPost>(blogPostsQuery);
+
+  const handleAddBlog = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPost.title || !newPost.excerpt) {
+    if (!newPost.title || !newPost.content) {
       toast({
         title: 'Error',
         description: 'Please fill out all fields.',
@@ -33,32 +45,37 @@ export default function AdminPage() {
       return;
     }
 
-    const newBlogPost: BlogPost = {
-      id: blogPosts.length + 1,
-      title: newPost.title,
-      date: new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      }),
-      excerpt: newPost.excerpt,
-    };
+    if (!user) {
+      toast({
+        title: 'Authentication Error',
+        description: 'You must be logged in to create a post.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-    // In a real app, you'd send this to a server.
-    // For now, we'll just update the state and log it.
-    const updatedBlogPosts = [...blogPosts, newBlogPost];
-    setBlogPosts(updatedBlogPosts);
-    console.log('Updated blog posts:', updatedBlogPosts);
+    try {
+      await addDoc(collection(firestore, 'blogPosts'), {
+        title: newPost.title,
+        content: newPost.content,
+        authorId: user.uid,
+        createdAt: serverTimestamp(),
+      });
 
-    // This is where you would typically write back to the JSON file,
-    // which is a server-side operation and not possible from the client.
-    // We are simulating the addition of the blog post.
-    toast({
-      title: 'Blog Post Added (Simulated)',
-      description: `The post "${newPost.title}" has been added to the local view.`,
-    });
+      toast({
+        title: 'Blog Post Added!',
+        description: `The post "${newPost.title}" has been saved.`,
+      });
 
-    setNewPost({ title: '', excerpt: '' });
+      setNewPost({ title: '', content: '' });
+    } catch (error) {
+      console.error('Error adding document: ', error);
+      toast({
+        title: 'Error',
+        description: 'There was an error saving the post.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -88,16 +105,17 @@ export default function AdminPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="excerpt">Excerpt</Label>
+                <Label htmlFor="content">Content</Label>
                 <Textarea
-                  id="excerpt"
-                  placeholder="A short summary of the blog post..."
-                  value={newPost.excerpt}
-                  onChange={(e) => setNewPost({ ...newPost, excerpt: e.target.value })}
+                  id="content"
+                  placeholder="The full content of the blog post..."
+                  value={newPost.content}
+                  onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                  rows={6}
                 />
               </div>
-              <Button type="submit" className="w-full glow-on-hover">
-                Add Post
+              <Button type="submit" className="w-full glow-on-hover" disabled={!user}>
+                {user ? 'Add Post' : 'Log in to Add Post'}
               </Button>
             </form>
           </CardContent>
@@ -106,17 +124,23 @@ export default function AdminPage() {
         <Card className="bg-secondary/30 border-primary/10">
           <CardHeader>
             <CardTitle>Existing Blog Posts</CardTitle>
-            <CardDescription>This is a read-only view of current posts.</CardDescription>
+            <CardDescription>This is a read-only view of current posts from the database.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-4">
-              {blogPosts.map((post) => (
+              {isLoading && <p>Loading posts...</p>}
+              {blogPosts && blogPosts.map((post: BlogPostWithId) => (
                 <div key={post.id} className="p-3 border rounded-md bg-background/50">
                   <h4 className="font-semibold">{post.title}</h4>
-                  <p className="text-sm text-muted-foreground">{post.date}</p>
-                  <p className="text-sm mt-1">{post.excerpt}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {post.createdAt?.toDate().toLocaleDateString()}
+                  </p>
+                  <p className="text-sm mt-1 truncate">{post.content}</p>
                 </div>
               ))}
+              {!isLoading && blogPosts?.length === 0 && (
+                <p className="text-muted-foreground text-center">No blog posts yet.</p>
+              )}
             </div>
           </CardContent>
         </Card>
