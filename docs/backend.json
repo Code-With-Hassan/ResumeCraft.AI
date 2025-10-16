@@ -1,0 +1,119 @@
+{
+  "entities": {
+    "BlogPost": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "BlogPost",
+      "type": "object",
+      "description": "Represents a blog post with its content, author, and associated data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the blog post."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the blog post."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main content of the blog post, likely in Markdown format."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Reference to the User who authored the blog post. (Relationship: User 1:N BlogPost)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the blog post was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the blog post was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "content",
+        "authorId",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the ResumeCraft AI application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "The user's name."
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles.  Path-based ownership; only the user can read/write their profile.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user, obtained from Firebase Authentication."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/blogPosts/{blogPostId}",
+        "definition": {
+          "entityName": "BlogPost",
+          "schema": {
+            "$ref": "#/backend/entities/BlogPost"
+          },
+          "description": "Stores blog posts created by a specific user. Path-based ownership; only the user can read/write their own blog posts.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (owner of the blog post)."
+            },
+            {
+              "name": "blogPostId",
+              "description": "The unique identifier for the blog post."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The data structure prioritizes authorization independence and QAPs.  Blog posts are stored under user-specific collections (`/users/{userId}/blogPosts/{blogPostId}`), providing path-based ownership. This eliminates the need for complex authorization rules based on querying parent documents, crucial for maintaining atomic operations. This structure inherently supports QAPs, as list operations are naturally scoped to a user's blog posts, preventing unauthorized data access. No denormalization is needed for this particular structure because the path itself enforces the user-post relationship, but if blog posts were to be located in a shared collection, the `authorId` must be denormalized into the blog post itself."
+  }
+}
