@@ -25,7 +25,7 @@ export default function MarkdownRenderer({ content, templateId, className }: Mar
           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
           .replace(/\*(.*?)\*/g, '<em>$1</em>');
         
-        return <p key={index} className="text-black" dangerouslySetInnerHTML={{ __html: formattedLine }} />;
+        return <p key={index} className="text-black my-0" dangerouslySetInnerHTML={{ __html: formattedLine }} />;
       })}
     </div>
   );
