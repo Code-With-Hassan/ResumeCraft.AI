@@ -22,6 +22,7 @@ const initialResumeData: ResumeData = {
     phone: "123-456-7890",
     website: "janedoe.io",
   },
+  summary: "A highly motivated and results-oriented professional with a proven track record of success in fast-paced environments. Seeking to leverage my skills and experience to contribute to a dynamic team.",
   education: [
     {
       institution: "Global University",

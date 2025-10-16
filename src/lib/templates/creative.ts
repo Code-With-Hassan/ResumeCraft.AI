@@ -5,11 +5,11 @@ export const creativeTemplate: Template = {
   id: 'creative',
   name: 'Creative',
   isPremium: true,
-  style: 'prose-h1:text-center prose-h1:text-3xl prose-h3:text-primary prose-h3:font-headline prose-blockquote:not-italic prose-blockquote:text-center prose-blockquote:text-base',
+  style: 'prose-h1:text-center prose-h1:text-3xl prose-h3:text-primary prose-h3:font-headline prose-blockquote:not-italic prose-blockquote:text-center prose-blockquote:text-base prose-p:my-0',
   markdown: `
 # {{name}}
 
-> A creative and driven professional with a passion for innovation. This section can be edited in the markdown template.
+> {{summary}}
 
 ### **Contact**
 - **Email:** {{email}}

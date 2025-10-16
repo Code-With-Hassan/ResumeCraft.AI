@@ -39,7 +39,7 @@ interface ResumeFormProps {
 }
 
 type ImprovementRequest = {
-    type: 'experience' | 'education' | 'skills',
+    type: 'experience' | 'education' | 'skills' | 'summary',
     index?: number
 } | null;
 
@@ -81,6 +81,10 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
     const { name, value } = e.target;
     setResumeData(prev => ({ ...prev, personal: { ...prev.personal, [name]: value } }));
   };
+  
+  const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setResumeData(prev => ({ ...prev, summary: e.target.value }));
+  };
 
   const handleSkillsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setResumeData(prev => ({ ...prev, skills: e.target.value }));
@@ -120,7 +124,7 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
     setResumeData(prev => ({ ...prev, education: newEducation }));
   };
 
-  const requestImprovement = (type: 'experience' | 'education' | 'skills', index?: number) => {
+  const requestImprovement = (type: 'experience' | 'education' | 'skills' | 'summary', index?: number) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -166,11 +170,11 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
   }
 
   const handleImproveContent = async (
-    type: 'experience' | 'education' | 'skills',
+    type: 'experience' | 'education' | 'skills' | 'summary',
     index?: number
   ) => {
     let contentToImprove = '';
-    const stateKey = type === 'skills' ? 'skills' : `${type}-${index}`;
+    const stateKey = type === 'skills' || type === 'summary' ? type : `${type}-${index}`;
     setIsImproving(stateKey);
 
     if (type === 'experience' && index !== undefined) {
@@ -179,6 +183,8 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
       contentToImprove = resumeData.education[index].details;
     } else if (type === 'skills') {
       contentToImprove = resumeData.skills;
+    } else if (type === 'summary') {
+      contentToImprove = resumeData.summary;
     }
 
     if (!contentToImprove.trim()) {
@@ -198,6 +204,8 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
             newData.education[index].details = result.improvedContent;
           } else if (type === 'skills') {
             newData.skills = result.improvedContent;
+          } else if (type === 'summary') {
+            newData.summary = result.improvedContent;
           }
           return newData;
         });
@@ -274,6 +282,14 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
                   <div className="space-y-2"><Label htmlFor="email">Email</Label><Input id="email" name="email" type="email" value={resumeData.personal.email} onChange={handlePersonalInfoChange} /></div>
                   <div className="space-y-2"><Label htmlFor="phone">Phone</Label><Input id="phone" name="phone" value={resumeData.personal.phone} onChange={handlePersonalInfoChange} /></div>
                   <div className="space-y-2"><Label htmlFor="website">Website/Portfolio</Label><Input id="website" name="website" value={resumeData.personal.website} onChange={handlePersonalInfoChange} /></div>
+                </div>
+                 <div className="space-y-2 relative">
+                  <Label htmlFor="summary">Summary</Label>
+                  <Textarea id="summary" value={resumeData.summary} onChange={handleSummaryChange} rows={3} />
+                   <Button size="sm" variant="outline" className="absolute bottom-2 right-2 glow-on-hover" onClick={() => requestImprovement('summary')} disabled={!!isImproving || !canUseAi}>
+                    {isImproving === 'summary' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Improve
+                  </Button>
                 </div>
               </AccordionContent>
           </AccordionItem>

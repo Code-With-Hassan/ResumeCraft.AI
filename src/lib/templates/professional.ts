@@ -5,10 +5,15 @@ export const professionalTemplate: Template = {
   id: 'professional',
   name: 'Professional',
   isPremium: false,
-  style: 'prose-h1:text-center prose-h2:text-lg prose-h2:uppercase prose-h2:tracking-widest prose-h2:font-semibold prose-h2:mt-4 prose-hr:my-2 prose-strong:font-semibold prose-blockquote:text-center',
+  style: 'prose-h1:text-center prose-h2:text-lg prose-h2:uppercase prose-h2:tracking-widest prose-h2:font-semibold prose-h2:mt-4 prose-hr:my-2 prose-strong:font-semibold prose-blockquote:text-center prose-p:my-0',
   markdown: `
 # {{name}}
 > {{email}} | {{phone}} | {{website}}
+
+***
+
+## Summary
+> {{summary}}
 
 ***
 

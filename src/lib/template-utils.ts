@@ -5,6 +5,8 @@ export const fillTemplate = (template: string, data: ResumeData): string => {
     Object.entries(data.personal).forEach(([key, value]) => {
       output = output.replace(new RegExp(`{{${key}}}`, 'g'), value || '');
     });
+
+    output = output.replace(/{{summary}}/g, data.summary || '');
   
     const processSection = (sectionName: 'experience' | 'education') => {
       const regex = new RegExp(`{{#${sectionName}}}(.*?){{\/${sectionName}}}`, 'gs');

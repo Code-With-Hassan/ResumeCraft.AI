@@ -23,6 +23,7 @@ export interface Experience {
 
 export interface ResumeData {
   personal: PersonalInfo;
+  summary: string;
   education: Education[];
   experience: Experience[];
   skills: string;
