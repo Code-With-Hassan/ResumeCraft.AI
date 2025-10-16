@@ -14,6 +14,7 @@ export default function MarkdownRenderer({ content, templateId, className }: Mar
     <div className={cn("prose prose-sm max-w-none text-black", className)}>
       {content.split('\n').map((line, index) => {
         if (line.trim() === '') return null;
+        if (line.startsWith('-> ')) return <p key={index} className="text-center my-0" dangerouslySetInnerHTML={{ __html: line.substring(3).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
         if (line.startsWith('### ')) return <h3 key={index} className="text-lg font-semibold mb-1 mt-3 text-black">{line.substring(4).replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '<em>$1</em>')}</h3>;
         if (line.startsWith('## ')) return <h2 key={index} className="text-xl font-bold border-b pb-2 mb-2 mt-4 text-black">{line.substring(3)}</h2>;
         if (line.startsWith('# ')) return <h1 key={index} className="text-3xl font-bold mb-2 text-black" dangerouslySetInnerHTML={{ __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />;
