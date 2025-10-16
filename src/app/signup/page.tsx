@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -6,13 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, Key, User } from 'lucide-react';
 import Link from 'next/link';
-import { useAuth } from '@/lib/auth';
+import { useAuth } from '@/firebase';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 export default function SignupPage() {
-  const { signup } = useAuth();
+  const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const [name, setName] = useState('');
@@ -22,7 +24,10 @@ export default function SignupPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
      try {
-      await signup(name, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      if (userCredential.user) {
+          await updateProfile(userCredential.user, { displayName: name });
+      }
       toast({ title: 'Signup Successful', description: "Welcome! You can now log in." });
       router.push('/login');
     } catch (error: any) {

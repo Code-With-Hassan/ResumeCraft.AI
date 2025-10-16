@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -10,7 +11,7 @@ import TemplateSelector from "@/components/resume/template-selector";
 import AdPlaceholder from "@/components/ad-placeholder";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PenSquare, LayoutTemplate, Send } from "lucide-react";
-import { useAuth } from "@/lib/auth";
+import { useUser } from '@/firebase';
 import { AdFactory } from "@/lib/ads/AdFactory";
 import { useToast } from "@/hooks/use-toast";
 
@@ -60,7 +61,7 @@ export default function BuilderPage() {
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
   const [adsWatched, setAdsWatched] = useState(0);
-  const { user } = useAuth();
+  const { user } = useUser();
   const { toast } = useToast();
 
   const handleWatchAd = async () => {

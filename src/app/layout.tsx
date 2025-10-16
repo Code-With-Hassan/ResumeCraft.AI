@@ -1,12 +1,12 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { AuthProvider } from '@/lib/auth';
 import { fontBody, fontHeadline } from '@/app/fonts';
 import { cn } from '@/lib/utils';
-import FirebaseErrorListener from '@/components/firebase/FirebaseErrorListener';
+import { FirebaseClientProvider } from '@/firebase';
 
 
 export const metadata: Metadata = {
@@ -23,15 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={cn("font-body antialiased bg-background text-foreground", fontHeadline.variable, fontBody.variable)}>
-        <AuthProvider>
-          <FirebaseErrorListener />
+        <FirebaseClientProvider>
           <Header />
           <main className="flex-1 w-full container mx-auto p-4 md:p-8">
             {children}
           </main>
           <Footer />
           <Toaster />
-        </AuthProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );

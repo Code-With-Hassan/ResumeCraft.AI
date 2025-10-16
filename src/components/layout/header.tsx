@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -7,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { useAuth } from '@/lib/auth';
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const navLinks = [
@@ -39,7 +41,12 @@ const NavLink = ({ href, label, onClick }: { href: string; label: string, onClic
 
 export default function Header() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const { user, loading, logout } = useAuth();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   const getInitials = (name: string | null) => {
     if (!name) return '';
@@ -66,17 +73,17 @@ export default function Header() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-4">
-            {!loading && user ? (
+            {!isUserLoading && user ? (
               <>
-                 <span className="text-sm font-medium">Welcome, {user.name}!</span>
+                 <span className="text-sm font-medium">Welcome, {user.displayName}!</span>
                  <Avatar className="h-9 w-9">
-                   <AvatarFallback className="bg-primary/20 font-bold">{getInitials(user.name)}</AvatarFallback>
+                   <AvatarFallback className="bg-primary/20 font-bold">{getInitials(user.displayName)}</AvatarFallback>
                  </Avatar>
                 <Button variant="ghost" onClick={logout} size="icon" aria-label="Log out">
                   <LogOut className="h-5 w-5" />
                 </Button>
               </>
-            ) : !loading && (
+            ) : !isUserLoading && (
               <>
                 <Button variant="ghost" asChild>
                   <Link href="/login">Log In</Link>
@@ -100,17 +107,17 @@ export default function Header() {
                   <NavLink key={link.href} {...link} onClick={() => setIsSheetOpen(false)}/>
                 ))}
                  <div className="flex flex-col gap-4 mt-4 border-t pt-6">
-                  {!loading && user ? (
+                  {!isUserLoading && user ? (
                     <>
                       <div className="flex items-center gap-3">
                          <Avatar>
-                           <AvatarFallback className="bg-primary/20 font-bold">{getInitials(user.name)}</AvatarFallback>
+                           <AvatarFallback className="bg-primary/20 font-bold">{getInitials(user.displayName)}</AvatarFallback>
                          </Avatar>
-                         <span className="font-semibold">{user.name}</span>
+                         <span className="font-semibold">{user.displayName}</span>
                       </div>
                       <Button variant="outline" onClick={() => { logout(); setIsSheetOpen(false); }}>Log Out</Button>
                     </>
-                  ) : !loading && (
+                  ) : !isUserLoading && (
                     <>
                       <Button variant="outline" asChild>
                         <Link href="/login" onClick={() => setIsSheetOpen(false)}>Log In</Link>

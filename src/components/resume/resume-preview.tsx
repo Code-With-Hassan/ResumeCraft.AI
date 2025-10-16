@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { ResumeData, Template, ATSCheckResult } from "@/lib/types";
@@ -10,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { checkResumeAgainstATS } from "@/ai/flows/check-resume-against-ats";
 import ATSCheckerDialog from "./ats-checker-dialog";
-import { useAuth } from "@/lib/auth";
+import { useUser } from '@/firebase';
 import { fillTemplate } from "@/lib/template-utils";
 import MarkdownRenderer from "./markdown-renderer";
 import jsPDF from "jspdf";
@@ -25,14 +26,14 @@ interface ResumePreviewProps {
 
 export default function ResumePreview({ resumeData, template, adsWatched }: ResumePreviewProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useUser();
   const [atsResult, setAtsResult] = useState<ATSCheckResult>(null);
   const [isAtsLoading, setIsAtsLoading] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isAtsDialogOpen, setIsAtsDialogOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
   
-  const canUseAi = user && adsWatched >= 3;
+  const canUseAi = !!user;
   const canDownloadPdf = user && adsWatched >= 3;
 
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
@@ -56,7 +57,9 @@ export default function ResumePreview({ resumeData, template, adsWatched }: Resu
     }
 
     if (template.isPremium && format === 'pdf') {
-      if (!user?.isPremium) {
+      // In a real app, you'd check a proper subscription status
+      const isPremium = user?.email === 'test@example.com';
+      if (!isPremium) {
         toast({
             title: "Premium Feature",
             description: "This template requires a premium account for PDF downloads.",

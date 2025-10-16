@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { User, Briefcase, GraduationCap, Wrench, Sparkles, PlusCircle, Trash2, Loader2, Save, Upload, Video, Cloud } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { improveResumeContent } from "@/ai/flows/improve-resume-content";
-import { useAuth } from "@/lib/auth";
+import { useUser, useFirestore } from '@/firebase';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AdFactory } from "@/lib/ads/AdFactory";
-import { firestore } from "@/lib/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
@@ -46,7 +45,8 @@ type ImprovementRequest = {
 
 export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWatched }: ResumeFormProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useUser();
+  const firestore = useFirestore();
   const [isImproving, setIsImproving] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [adDialogOpen, setAdDialogOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
 
   useEffect(() => {
     const loadResumeFromFirestore = async () => {
-      if (user) {
+      if (user && firestore) {
         const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
         getDoc(docRef).then(docSnap => {
             if (docSnap.exists()) {
@@ -74,7 +74,7 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
     };
 
     loadResumeFromFirestore();
-  }, [user, setResumeData, toast]);
+  }, [user, firestore, setResumeData, toast]);
 
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -212,7 +212,7 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
   };
 
   const saveResumeToFirestore = async () => {
-    if (!user) {
+    if (!user || !firestore) {
       toast({ title: 'Authentication Required', description: 'Please log in to save your data.', variant: 'destructive' });
       return;
     }
