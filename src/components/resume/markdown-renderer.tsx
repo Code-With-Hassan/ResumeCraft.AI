@@ -14,19 +14,23 @@ export default function MarkdownRenderer({ content, templateId, className }: Mar
     <div className={cn("prose prose-sm max-w-none text-black", className)}>
       {content.split('\n').map((line, index) => {
         if (line.trim() === '') return null;
-        if (line.startsWith('-> ')) return <p key={index} className="text-center my-0" dangerouslySetInnerHTML={{ __html: line.substring(3).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
-        if (line.startsWith('### ')) return <h3 key={index} className="text-lg font-semibold mb-1 mt-3 text-black">{line.substring(4).replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '<em>$1</em>')}</h3>;
-        if (line.startsWith('## ')) return <h2 key={index} className="text-xl font-bold border-b pb-2 mb-2 mt-4 text-black">{line.substring(3)}</h2>;
-        if (line.startsWith('# ')) return <h1 key={index} className="text-3xl font-bold mb-2 text-black" dangerouslySetInnerHTML={{ __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />;
-        if (line.startsWith('> ')) return <blockquote key={index} className="border-l-4 border-primary pl-4 text-gray-600 italic my-2">{line.substring(2)}</blockquote>;
-        if (line.startsWith('---')) return <hr key={index} className="my-4" />;
-        if (line.startsWith('- ')) return <li key={index} className="ml-4" dangerouslySetInnerHTML={{ __html: line.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
         
-        const formattedLine = line
+        const isCentered = line.startsWith('-> ');
+        const content = isCentered ? line.substring(3) : line;
+        const centerClass = isCentered ? 'text-center' : '';
+
+        if (content.startsWith('### ')) return <h3 key={index} className={cn("text-lg font-semibold mb-1 mt-3 text-black", centerClass)} dangerouslySetInnerHTML={{ __html: content.substring(4).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
+        if (content.startsWith('## ')) return <h2 key={index} className={cn("text-xl font-bold border-b pb-2 mb-2 mt-4 text-black", centerClass)} dangerouslySetInnerHTML={{ __html: content.substring(3).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
+        if (content.startsWith('# ')) return <h1 key={index} className={cn("text-3xl font-bold mb-2 text-black", centerClass)} dangerouslySetInnerHTML={{ __html: content.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
+        if (content.startsWith('> ')) return <blockquote key={index} className={cn("border-l-4 border-primary pl-4 text-gray-600 italic my-2", centerClass)}>{content.substring(2)}</blockquote>;
+        if (content.startsWith('---')) return <hr key={index} className="my-4" />;
+        if (content.startsWith('- ')) return <li key={index} className={cn("ml-4", centerClass)} dangerouslySetInnerHTML={{ __html: content.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
+        
+        const formattedLine = content
           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
           .replace(/\*(.*?)\*/g, '<em>$1</em>');
         
-        return <p key={index} className="text-black my-0" dangerouslySetInnerHTML={{ __html: formattedLine }} />;
+        return <p key={index} className={cn("text-black my-0", centerClass)} dangerouslySetInnerHTML={{ __html: formattedLine }} />;
       })}
     </div>
   );
