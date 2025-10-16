@@ -5,7 +5,7 @@ export const boldAccentTemplate: Template = {
   id: 'bold-accent',
   name: 'Bold Accent',
   isPremium: true,
-  style: 'prose-headings:text-primary prose-headings:font-bold prose-strong:font-bold',
+  style: 'prose-headings:text-primary prose-headings:font-bold prose-strong:font-bold prose-p:my-1',
   markdown: `
 # **{{name}}**
 > {{email}} • {{phone}} • {{website}}
