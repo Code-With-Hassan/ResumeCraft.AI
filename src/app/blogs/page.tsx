@@ -1,27 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-
-const blogPosts = [
-  {
-    id: 1,
-    title: 'The Rise of the AI-Crafted Resume',
-    date: 'October 26, 2023',
-    excerpt: 'Discover how artificial intelligence is revolutionizing the job application process and what it means for your resume.',
-  },
-  {
-    id: 2,
-    title: '5 Keywords Every Tech Resume Needs in 2024',
-    date: 'October 22, 2023',
-    excerpt: 'Stay ahead of the curve. We break down the essential keywords to get your resume noticed by top tech recruiters.',
-  },
-  {
-    id: 3,
-    title: 'Beating the Bots: A Guide to ATS Optimization',
-    date: 'October 18, 2023',
-    excerpt: 'Applicant Tracking Systems can be a barrier. Learn the strategies to ensure your resume always makes it to a human reader.',
-  },
-];
+import blogPostsData from '@/lib/blog-posts.json';
 
 export default function BlogsPage() {
   return (
@@ -34,7 +14,7 @@ export default function BlogsPage() {
       </section>
 
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {blogPosts.map(post => (
+        {blogPostsData.posts.map(post => (
           <Card key={post.id} className="bg-secondary/30 border-primary/10 flex flex-col">
             <CardHeader>
               <CardTitle>{post.title}</CardTitle>

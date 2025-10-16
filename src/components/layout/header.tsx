@@ -17,6 +17,7 @@ const navLinks = [
   { href: '/pricing', label: 'Pricing' },
   { href: '/contact', label: 'Contact Us' },
   { href: '/builder', label: 'Builder' },
+  { href: '/admin', label: 'Admin' },
 ];
 
 const NavLink = ({ href, label, onClick }: { href: string; label: string, onClick?: () => void }) => {

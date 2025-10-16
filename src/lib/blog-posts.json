@@ -1,0 +1,23 @@
+
+{
+  "posts": [
+    {
+      "id": 1,
+      "title": "The Rise of the AI-Crafted Resume",
+      "date": "October 26, 2023",
+      "excerpt": "Discover how artificial intelligence is revolutionizing the job application process and what it means for your resume."
+    },
+    {
+      "id": 2,
+      "title": "5 Keywords Every Tech Resume Needs in 2024",
+      "date": "October 22, 2023",
+      "excerpt": "Stay ahead of the curve. We break down the essential keywords to get your resume noticed by top tech recruiters."
+    },
+    {
+      "id": 3,
+      "title": "Beating the Bots: A Guide to ATS Optimization",
+      "date": "October 18, 2023",
+      "excerpt": "Applicant Tracking Systems can be a barrier. Learn the strategies to ensure your resume always makes it to a human reader."
+    }
+  ]
+}
