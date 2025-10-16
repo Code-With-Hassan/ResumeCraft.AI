@@ -106,7 +106,13 @@
     "providers": [
       "password",
       "anonymous"
-    ]
+    ],
+    "customClaims": {
+      "admin": {
+        "type": "boolean",
+        "description": "Grants administrative privileges to the user, allowing them to manage blog posts and view all user data."
+      }
+    }
   },
   "firestore": {
     "/users/{userId}": {
@@ -119,13 +125,13 @@
       "schema": {
         "$ref": "#/entities/Resume"
       },
-      "description": "Stores a user's resume data. Only the owner can read/write."
+      "description": "Stores a user's resume data. Only the owner can write. Owners and admins can read."
     },
     "/blogPosts/{blogPostId}": {
       "schema": {
         "$ref": "#/entities/BlogPost"
       },
-      "description": "Stores blog posts for the website. Publicly readable, but only writable by authenticated users."
+      "description": "Stores blog posts for the website. Publicly readable, but only writable by admin users."
     }
   }
 }
