@@ -2,16 +2,32 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import type { ResumeStyles } from "@/lib/types";
+import React from 'react';
 
 interface MarkdownRendererProps {
   content: string;
   templateId: string;
   className?: string;
+  styles: ResumeStyles;
 }
 
-export default function MarkdownRenderer({ content, templateId, className }: MarkdownRendererProps) {
+export default function MarkdownRenderer({ content, templateId, className, styles }: MarkdownRendererProps) {
+  const getStyle = (tag: 'h1' | 'h2' | 'h3' | 'p'): React.CSSProperties => {
+    const style = styles[tag];
+    return {
+      fontFamily: style.fontFamily,
+      fontSize: `${style.fontSize}px`,
+      color: style.color,
+      // Resetting some prose styles that might interfere
+      marginTop: '0', 
+      marginBottom: '0',
+      lineHeight: '1.4'
+    };
+  };
+
   return (
-    <div className={cn("prose prose-sm max-w-none text-black", className)}>
+    <div className={cn("prose prose-sm max-w-none", className)}>
       {content.split('\n').map((line, index) => {
         if (line.trim() === '') return null;
         
@@ -19,18 +35,18 @@ export default function MarkdownRenderer({ content, templateId, className }: Mar
         const rawContent = isCentered ? line.substring(3) : line;
         const centerClass = isCentered ? 'text-center' : '';
 
-        if (rawContent.startsWith('### ')) return <h3 key={index} className={cn("text-lg font-semibold mb-1 mt-3 text-black", centerClass)} dangerouslySetInnerHTML={{ __html: rawContent.substring(4).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
-        if (rawContent.startsWith('## ')) return <h2 key={index} className={cn("text-xl font-bold border-b pb-2 mb-2 mt-4 text-black", centerClass)} dangerouslySetInnerHTML={{ __html: rawContent.substring(3).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
-        if (rawContent.startsWith('# ')) return <h1 key={index} className={cn("text-3xl font-bold mb-2 text-black", centerClass)} dangerouslySetInnerHTML={{ __html: rawContent.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
+        const renderContent = (content: string) => (
+          <span dangerouslySetInnerHTML={{ __html: content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
+        );
+
+        if (rawContent.startsWith('### ')) return <h3 key={index} className={cn("pb-1 mb-1 mt-2", centerClass)} style={getStyle('h3')}>{renderContent(rawContent.substring(4))}</h3>;
+        if (rawContent.startsWith('## ')) return <h2 key={index} className={cn("pb-1 mb-1 mt-2", centerClass)} style={getStyle('h2')}>{renderContent(rawContent.substring(3))}</h2>;
+        if (rawContent.startsWith('# ')) return <h1 key={index} className={cn("pb-1 mb-1", centerClass)} style={getStyle('h1')}>{renderContent(rawContent.substring(2))}</h1>;
         if (rawContent.startsWith('> ')) return <blockquote key={index} className={cn("border-l-4 border-primary pl-4 text-gray-600 italic my-2", centerClass)}>{rawContent.substring(2)}</blockquote>;
-        if (rawContent.startsWith('---')) return <hr key={index} className="my-3" />;
-        if (rawContent.startsWith('- ')) return <li key={index} className={cn("ml-4", centerClass)} dangerouslySetInnerHTML={{ __html: rawContent.substring(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />;
+        if (rawContent.startsWith('---')) return <div key={index} className={cn("my-2 bg-gray-300")} style={{height: '0.1em'}}></div>;
+        if (rawContent.startsWith('- ')) return <li key={index} className={cn("ml-4 my-0", centerClass)} style={getStyle('p')}>{renderContent(rawContent.substring(2))}</li>;
         
-        const formattedLine = rawContent
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        return <p key={index} className={cn("text-black my-0", centerClass)} dangerouslySetInnerHTML={{ __html: formattedLine }} />;
+        return <p key={index} className={cn("my-0", centerClass)} style={getStyle('p')}>{renderContent(rawContent)}</p>;
       })}
     </div>
   );

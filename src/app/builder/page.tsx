@@ -8,11 +8,10 @@ import { templates } from "@/lib/templates";
 import ResumeForm from "@/components/resume/resume-form";
 import ResumePreview from "@/components/resume/resume-preview";
 import TemplateSelector from "@/components/resume/template-selector";
-import AdPlaceholder from "@/components/ad-placeholder";
+import ResumeStyler from "@/components/resume/resume-styler";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PenSquare, LayoutTemplate, Send } from "lucide-react";
+import { PenSquare, LayoutTemplate, Palette } from "lucide-react";
 import { useUser } from '@/firebase';
-import { AdFactory } from "@/lib/ads/AdFactory";
 import { useToast } from "@/hooks/use-toast";
 
 const initialResumeData: ResumeData = {
@@ -56,6 +55,12 @@ const initialResumeData: ResumeData = {
     },
   ],
   skills: "TypeScript, React, Node.js, Python, PostgreSQL, AWS, Docker, Kubernetes",
+  styles: {
+    h1: { fontSize: 30, fontFamily: "var(--font-headline)", color: "#000000" },
+    h2: { fontSize: 22, fontFamily: "var(--font-headline)", color: "#000000" },
+    h3: { fontSize: 18, fontFamily: "var(--font-headline)", color: "#000000" },
+    p: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333" },
+  }
 };
 
 export default function BuilderPage() {
@@ -64,35 +69,6 @@ export default function BuilderPage() {
   const [adsWatched, setAdsWatched] = useState(0);
   const { user } = useUser();
   const { toast } = useToast();
-
-  const handleWatchAd = async () => {
-    if (adsWatched < 3) {
-      const adNetwork = AdFactory.getAdNetwork('GoogleAdSense');
-      try {
-        const adWatched = await adNetwork.showRewardedAd();
-        if (adWatched) {
-          setAdsWatched(prev => prev + 1);
-          toast({
-            title: "Ad Watched!",
-            description: "Thank you for supporting our platform.",
-          });
-        } else {
-          toast({
-            title: "Ad Skipped",
-            description: "You must watch the ad to get the reward.",
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error("Ad error:", error);
-        toast({
-          title: "Ad Error",
-          description: "Could not load ad. Please try again later.",
-          variant: "destructive",
-        });
-      }
-    }
-  };
   
   const incrementAdsWatched = () => {
      if (adsWatched < 3) {
@@ -115,14 +91,13 @@ export default function BuilderPage() {
               <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="edit"><PenSquare className="mr-2 h-4 w-4"/> Edit</TabsTrigger>
                 <TabsTrigger value="template"><LayoutTemplate className="mr-2 h-4 w-4"/> Template</TabsTrigger>
-                <TabsTrigger value="export"><Send className="mr-2 h-4 w-4"/> Export</TabsTrigger>
+                <TabsTrigger value="style"><Palette className="mr-2 h-4 w-4"/> Style</TabsTrigger>
               </TabsList>
               <TabsContent value="edit">
                 <ResumeForm 
                   resumeData={resumeData} 
                   setResumeData={setResumeData} 
                   onWatchAd={incrementAdsWatched}
-                  adsWatched={adsWatched}
                 />
               </TabsContent>
               <TabsContent value="template">
@@ -132,13 +107,21 @@ export default function BuilderPage() {
                   onSelect={setSelectedTemplate}
                 />
               </TabsContent>
-              <TabsContent value="export">
-                <AdPlaceholder adsWatched={adsWatched} onWatchAd={handleWatchAd} />
+              <TabsContent value="style">
+                <ResumeStyler 
+                  resumeStyles={resumeData.styles} 
+                  setResumeData={setResumeData} 
+                />
               </TabsContent>
             </Tabs>
         </div>
         <div className="lg:col-span-7 lg:sticky top-8">
-          <ResumePreview resumeData={resumeData} template={selectedTemplate} adsWatched={adsWatched} />
+          <ResumePreview 
+            resumeData={resumeData} 
+            template={selectedTemplate} 
+            adsWatched={adsWatched} 
+            onWatchAd={incrementAdsWatched}
+          />
         </div>
       </div>
     </>

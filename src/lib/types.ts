@@ -1,3 +1,4 @@
+
 export interface PersonalInfo {
   name: string;
   email: string;
@@ -21,12 +22,26 @@ export interface Experience {
   description: string;
 }
 
+export interface StyleSetting {
+  fontSize: number; // in px
+  fontFamily: string;
+  color: string; // hex color
+}
+
+export interface ResumeStyles {
+  h1: StyleSetting;
+  h2: StyleSetting;
+  h3: StyleSetting;
+  p: StyleSetting;
+}
+
 export interface ResumeData {
   personal: PersonalInfo;
   summary: string;
   education: Education[];
   experience: Experience[];
   skills: string;
+  styles: ResumeStyles;
 }
 
 export interface Template {

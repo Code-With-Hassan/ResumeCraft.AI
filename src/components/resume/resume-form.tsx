@@ -35,7 +35,6 @@ interface ResumeFormProps {
   resumeData: ResumeData;
   setResumeData: Dispatch<SetStateAction<ResumeData>>;
   onWatchAd: () => void;
-  adsWatched: number;
 }
 
 type ImprovementRequest = {
@@ -43,7 +42,7 @@ type ImprovementRequest = {
     index?: number
 } | null;
 
-export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWatched }: ResumeFormProps) {
+export default function ResumeForm({ resumeData, setResumeData, onWatchAd }: ResumeFormProps) {
   const { toast } = useToast();
   const { user } = useUser();
   const firestore = useFirestore();
@@ -74,7 +73,8 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd, adsWa
     };
 
     loadResumeFromFirestore();
-  }, [user, firestore, setResumeData, toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, firestore]);
 
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {

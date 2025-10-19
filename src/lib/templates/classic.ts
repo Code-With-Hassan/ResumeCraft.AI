@@ -9,11 +9,11 @@ export const classicTemplate: Template = {
   markdown: `
 -> # {{name}}
 -> {{email}} | {{phone}} | {{website}}
-
 ---
 -> *{{summary}}*
 
 ## Experience
+---
 {{#experience}}
 ### **{{title}}** | {{company}}
 *{{startDate}} – {{endDate}}*
@@ -22,6 +22,7 @@ export const classicTemplate: Template = {
 {{/experience}}
 
 ## Education
+---
 {{#education}}
 ### **{{degree}}** | {{institution}}
 *{{startDate}} – {{endDate}}*
@@ -30,6 +31,7 @@ export const classicTemplate: Template = {
 {{/education}}
 
 ## Skills
+---
 {{skills}}
     `,
 };
