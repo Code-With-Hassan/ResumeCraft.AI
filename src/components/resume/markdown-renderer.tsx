@@ -4,6 +4,7 @@
 import { cn } from "@/lib/utils";
 import type { ResumeStyles } from "@/lib/types";
 import React from 'react';
+import { fontBody, fontHeadline } from "@/app/fonts";
 
 interface MarkdownRendererProps {
   content: string;
@@ -12,9 +13,18 @@ interface MarkdownRendererProps {
   styles: ResumeStyles;
 }
 
+const defaultStyles: ResumeStyles = {
+    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
+    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
+    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
+    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333" },
+};
+
 export default function MarkdownRenderer({ content, templateId, className, styles }: MarkdownRendererProps) {
+  const safeStyles = styles || defaultStyles;
+
   const getStyle = (tag: 'h1' | 'h2' | 'h3' | 'p'): React.CSSProperties => {
-    const style = styles[tag];
+    const style = safeStyles[tag];
     return {
       fontFamily: style.fontFamily,
       fontSize: `${style.fontSize}px`,
