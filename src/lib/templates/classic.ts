@@ -8,20 +8,17 @@ export const classicTemplate: Template = {
   style: 'prose-h1:tracking-tight prose-h2:mt-6 prose-h3:text-lg prose-h3:font-semibold prose-hr:my-4 prose-ul:mt-2 prose-p:my-0',
   markdown: `
 -> # {{name}}
--> {{email}} • {{phone}} • {{website}}
+-> {{email}} | {{phone}} | {{website}}
 
 ---
-
--> {{summary}}
-
----
+-> *{{summary}}*
 
 ## Experience
 {{#experience}}
 ### **{{title}}** | {{company}}
 *{{startDate}} – {{endDate}}*
 
-- {{description}}
+{{description}}
 {{/experience}}
 
 ## Education
@@ -29,10 +26,10 @@ export const classicTemplate: Template = {
 ### **{{degree}}** | {{institution}}
 *{{startDate}} – {{endDate}}*
 
-- {{details}}
+{{details}}
 {{/education}}
 
 ## Skills
-- {{skills}}
+{{skills}}
     `,
 };
