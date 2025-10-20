@@ -40,13 +40,16 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
     property: keyof ResumeStyles[keyof ResumeStyles],
     value: string | number
   ) => {
+    // Ensure numeric values are handled correctly
+    const numericValue = (property === 'fontSize' && typeof value === 'string') ? parseInt(value, 10) : value;
+
     setResumeData(prev => ({
       ...prev,
       styles: {
         ...safeResumeStyles,
         [element]: {
           ...safeResumeStyles[element],
-          [property]: value
+          [property]: numericValue
         }
       }
     }));
@@ -60,14 +63,22 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
       <div className="space-y-4 p-4 border border-border rounded-lg bg-background/50">
         <h4 className="font-semibold text-lg">{title}</h4>
         <div className="space-y-2">
-          <Label>Font Size: {styles.fontSize}px</Label>
-          <Slider
-            value={[styles.fontSize]}
-            onValueChange={([val]) => handleStyleChange(element, 'fontSize', val)}
-            min={8}
-            max={48}
-            step={1}
-          />
+          <Label>Font Size</Label>
+           <div className="flex items-center gap-4">
+            <Slider
+              value={[styles.fontSize]}
+              onValueChange={([val]) => handleStyleChange(element, 'fontSize', val)}
+              min={8}
+              max={48}
+              step={1}
+            />
+             <Input
+                type="number"
+                value={styles.fontSize}
+                onChange={(e) => handleStyleChange(element, 'fontSize', e.target.value)}
+                className="w-20"
+              />
+          </div>
         </div>
         <div className="space-y-2">
           <Label>Font Family</Label>
@@ -76,7 +87,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
             onValueChange={(val) => handleStyleChange(element, 'fontFamily', val)}
           >
             <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
+            <SelectContent position="item-aligned">
               {FONT_FAMILIES.map(font => (
                 <SelectItem key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.name}</SelectItem>
               ))}
