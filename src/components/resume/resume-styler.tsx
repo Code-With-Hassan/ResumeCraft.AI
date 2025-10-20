@@ -24,7 +24,16 @@ const FONT_FAMILIES = [
   { name: 'Times New Roman', value: "'Times New Roman', serif" },
 ];
 
+const defaultStyles: ResumeStyles = {
+    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
+    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
+    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
+    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333" },
+};
+
 export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStylerProps) {
+
+  const safeResumeStyles = resumeStyles || defaultStyles;
 
   const handleStyleChange = (
     element: keyof ResumeStyles,
@@ -34,9 +43,9 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
     setResumeData(prev => ({
       ...prev,
       styles: {
-        ...prev.styles,
+        ...safeResumeStyles,
         [element]: {
-          ...prev.styles[element],
+          ...safeResumeStyles[element],
           [property]: value
         }
       }
@@ -44,9 +53,8 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
   };
   
   const StyleEditor = ({ element, title }: { element: keyof ResumeStyles, title: string }) => {
-    if (!resumeStyles) return null; // Guard against undefined styles
-    const styles = resumeStyles[element];
-    if (!styles) return null; // Guard against undefined individual style
+    const styles = safeResumeStyles[element];
+    if (!styles) return null; // Should not happen with safeResumeStyles
 
     return (
       <div className="space-y-4 p-4 border border-border rounded-lg bg-background/50">
