@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ResumeData, Template } from "@/lib/types";
 import { templates } from "@/lib/templates";
 import ResumeForm from "@/components/resume/resume-form";
@@ -11,8 +11,11 @@ import TemplateSelector from "@/components/resume/template-selector";
 import ResumeStyler from "@/components/resume/resume-styler";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PenSquare, LayoutTemplate, Palette } from "lucide-react";
-import { useUser } from '@/firebase';
+import { useUser, useFirestore } from '@/firebase';
 import { useToast } from "@/hooks/use-toast";
+import { doc, getDoc } from "firebase/firestore";
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 const initialResumeData: ResumeData = {
   personal: {
@@ -68,8 +71,42 @@ export default function BuilderPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
   const [adsWatched, setAdsWatched] = useState(0);
   const { user } = useUser();
+  const firestore = useFirestore();
   const { toast } = useToast();
   
+  useEffect(() => {
+    const loadResumeFromFirestore = async () => {
+      if (user && firestore) {
+        const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
+        getDoc(docRef).then(docSnap => {
+            if (docSnap.exists()) {
+              // Merge fetched data with initial data to ensure styles are present
+              const fetchedData = docSnap.data();
+              setResumeData(prev => ({
+                ...initialResumeData,
+                ...prev,
+                ...fetchedData,
+                personal: {...initialResumeData.personal, ...prev.personal, ...fetchedData.personal},
+                styles: { ...initialResumeData.styles, ...prev.styles, ...fetchedData.styles }
+              }));
+               toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded from the cloud.' });
+            } else {
+              console.log("No saved resume found.");
+            }
+        }).catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: docRef.path,
+                operation: 'get',
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
+      }
+    };
+
+    loadResumeFromFirestore();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, firestore]);
+
   const incrementAdsWatched = () => {
      if (adsWatched < 3) {
       setAdsWatched(prev => prev + 1);
@@ -78,7 +115,7 @@ export default function BuilderPage() {
 
   return (
     <>
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-primary">Craft Your Future with AI</h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
           Input your details, choose a template, and let our AI enhance your resume to perfection.

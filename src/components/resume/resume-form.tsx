@@ -4,7 +4,7 @@
 
 import type { Dispatch, SetStateAction } from "react";
 import type { ResumeData, Experience, Education } from "@/lib/types";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { AdFactory } from "@/lib/ads/AdFactory";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import { errorEmitter } from "@/firebase/error-emitter";
 import { FirestorePermissionError } from "@/firebase/errors";
 
@@ -50,32 +50,6 @@ export default function ResumeForm({ resumeData, setResumeData, onWatchAd }: Res
   const [isSaving, setIsSaving] = useState(false);
   const [adDialogOpen, setAdDialogOpen] = useState(false);
   const [currentImprovementRequest, setCurrentImprovementRequest] = useState<ImprovementRequest>(null);
-
-  useEffect(() => {
-    const loadResumeFromFirestore = async () => {
-      if (user && firestore) {
-        const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
-        getDoc(docRef).then(docSnap => {
-            if (docSnap.exists()) {
-              setResumeData(docSnap.data() as ResumeData);
-               toast({ title: 'Data Loaded!', description: 'Your resume data has been loaded from the cloud.' });
-            } else {
-              console.log("No such document!");
-            }
-        }).catch(async (serverError) => {
-            const permissionError = new FirestorePermissionError({
-                path: docRef.path,
-                operation: 'get',
-            });
-            errorEmitter.emit('permission-error', permissionError);
-        });
-      }
-    };
-
-    loadResumeFromFirestore();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore]);
-
 
   const handlePersonalInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
