@@ -44,7 +44,10 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
   };
   
   const StyleEditor = ({ element, title }: { element: keyof ResumeStyles, title: string }) => {
+    if (!resumeStyles) return null; // Guard against undefined styles
     const styles = resumeStyles[element];
+    if (!styles) return null; // Guard against undefined individual style
+
     return (
       <div className="space-y-4 p-4 border border-border rounded-lg bg-background/50">
         <h4 className="font-semibold text-lg">{title}</h4>
