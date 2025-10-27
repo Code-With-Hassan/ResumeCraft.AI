@@ -92,7 +92,7 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
     try {
         const canvas = await html2canvas(printRef.current, { 
           scale: 3, 
-          backgroundColor: '#ffffff', // Ensure a white background
+          backgroundColor: '#ffffff',
           useCORS: true 
         });
         const imgData = canvas.toDataURL('image/png');
@@ -106,7 +106,6 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
         let heightLeft = imgHeight;
         let position = 0;
 
-        // Add image to PDF, ensuring it fits the width and starts at the top
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
         heightLeft -= pdfHeight;
 
@@ -215,7 +214,7 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
           </div>
         </CardHeader>
         <CardContent className="bg-gray-100 rounded-b-lg p-4 md:p-8 shadow-inner overflow-y-auto" style={{minHeight: '800px'}}>
-          <div ref={printRef} className="bg-white p-8 rounded-md shadow-md aspect-[210/297] w-full max-w-[210mm] mx-auto">
+          <div ref={printRef} className="bg-white p-8 rounded-md shadow-md aspect-[210/297] mx-auto" style={{width: '210mm'}}>
             <MarkdownRenderer 
               content={finalMarkdown} 
               templateId={template.id} 
@@ -243,5 +242,6 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
     </>
   );
 }
+
 
 
