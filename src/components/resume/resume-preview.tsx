@@ -90,7 +90,11 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
     }
     setIsPdfLoading(true);
     try {
-        const canvas = await html2canvas(printRef.current, { scale: 3, backgroundColor: null });
+        const canvas = await html2canvas(printRef.current, { 
+          scale: 3, 
+          backgroundColor: '#ffffff', // Ensure a white background
+          useCORS: true 
+        });
         const imgData = canvas.toDataURL('image/png');
         
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -102,7 +106,8 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
         let heightLeft = imgHeight;
         let position = 0;
 
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+        // Add image to PDF, ensuring it fits the width and starts at the top
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgHeight);
         heightLeft -= pdfHeight;
 
         while (heightLeft > 0) {
@@ -238,4 +243,5 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
     </>
   );
 }
+
 
