@@ -30,9 +30,10 @@ export default function MarkdownRenderer({ content, templateId, className, style
       fontSize: `${style.fontSize}px`,
       color: style.color,
       // Resetting some prose styles that might interfere
-      marginTop: '0', 
-      marginBottom: '0.2em', // Add a small consistent bottom margin
-      lineHeight: '1.4' // Standardize line height
+      marginTop: '0',
+      marginBottom: tag === 'p' ? '0' : '2px',
+      paddingBottom: tag === 'p' ? '0' : '2px', // Add a small consistent bottom margin
+      lineHeight: '1' // Standardize line height
     };
   };
 
@@ -49,11 +50,11 @@ export default function MarkdownRenderer({ content, templateId, className, style
           <span dangerouslySetInnerHTML={{ __html: content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>') }} />
         );
 
-        if (rawContent.startsWith('### ')) return <h3 key={index} className={cn("pb-1 mt-2", centerClass)} style={getStyle('h3')}>{renderContent(rawContent.substring(4))}</h3>;
-        if (rawContent.startsWith('## ')) return <h2 key={index} className={cn("pb-1 mt-2", centerClass)} style={getStyle('h2')}>{renderContent(rawContent.substring(3))}</h2>;
-        if (rawContent.startsWith('# ')) return <h1 key={index} className={cn("pb-1", centerClass)} style={getStyle('h1')}>{renderContent(rawContent.substring(2))}</h1>;
-        if (rawContent.startsWith('> ')) return <blockquote key={index} className={cn("border-l-4 border-primary pl-4 italic my-2", centerClass)}>{rawContent.substring(2)}</blockquote>;
-        if (rawContent.startsWith('---')) return <div key={index} className={cn("my-2 bg-gray-300")} style={{height: '0.1em'}}></div>;
+        if (rawContent.startsWith('### ')) return <h3 key={index} className={cn("",centerClass)} style={getStyle('h3')}>{renderContent(rawContent.substring(4))}</h3>;
+        if (rawContent.startsWith('## ')) return <h2 key={index} className={cn("", centerClass)} style={getStyle('h2')}>{renderContent(rawContent.substring(3))}</h2>;
+        if (rawContent.startsWith('# ')) return <h1 key={index} className={cn("", centerClass)} style={getStyle('h1')}>{renderContent(rawContent.substring(2))}</h1>;
+        if (rawContent.startsWith('> ')) return <blockquote key={index} className={cn("border-l-4 border-primary pl-4 italic", centerClass)}>{rawContent.substring(2)}</blockquote>;
+        if (rawContent.startsWith('---')) return <div key={index} className={cn("bg-gray-300")} style={{height: '0.1em'}}></div>;
         if (rawContent.startsWith('- ')) return <li key={index} className={cn("ml-4", centerClass)} style={getStyle('p')}>{renderContent(rawContent.substring(2))}</li>;
         
         return <p key={index} className={cn("", centerClass)} style={getStyle('p')}>{renderContent(rawContent)}</p>;

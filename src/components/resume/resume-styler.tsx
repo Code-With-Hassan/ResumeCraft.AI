@@ -57,7 +57,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
   
   const StyleEditor = ({ element, title }: { element: keyof ResumeStyles, title: string }) => {
     const styles = safeResumeStyles[element];
-    if (!styles) return null; // Should not happen with safeResumeStyles
+    if (!styles) return null;
 
     return (
       <div className="space-y-4 p-4 border border-border rounded-lg bg-background/50">
@@ -87,7 +87,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
             onValueChange={(val) => handleStyleChange(element, 'fontFamily', val)}
           >
             <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent position="item-aligned">
+            <SelectContent position="popper">
               {FONT_FAMILIES.map(font => (
                 <SelectItem key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.name}</SelectItem>
               ))}
@@ -116,9 +116,9 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
   };
 
   return (
-    <Card className="shadow-lg bg-card">
+    <Card className="shadow-lg bg-card h-full">
       <CardHeader>
-        <CardTitle className="text-2xl">Style Your Resume</CardTitle>
+        <CardTitle className="text-xl">Style Your Resume</CardTitle>
         <CardDescription>
           Customize fonts and colors for your resume elements.
         </CardDescription>

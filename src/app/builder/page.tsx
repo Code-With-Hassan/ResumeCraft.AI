@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -7,10 +6,9 @@ import type { ResumeData, Template } from "@/lib/types";
 import { templates } from "@/lib/templates";
 import ResumeForm from "@/components/resume/resume-form";
 import ResumePreview from "@/components/resume/resume-preview";
-import TemplateSelector from "@/components/resume/template-selector";
-import ResumeStyler from "@/components/resume/resume-styler";
+import StyleTemplateForm from "@/components/resume/style-template-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PenSquare, LayoutTemplate, Palette } from "lucide-react";
+import { PenSquare, LayoutTemplate, Eye, Palette } from "lucide-react";
 import { useUser, useFirestore } from '@/firebase';
 import { useToast } from "@/hooks/use-toast";
 import { doc, getDoc } from "firebase/firestore";
@@ -118,48 +116,46 @@ export default function BuilderPage() {
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 text-primary">Craft Your Future with AI</h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-          Input your details, choose a template, and let our AI enhance your resume to perfection.
+          Follow the steps to input your details, style your resume, and let our AI enhance it to perfection.
         </p>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-5">
-            <Tabs defaultValue="edit" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="edit"><PenSquare className="mr-2 h-4 w-4"/> Edit</TabsTrigger>
-                <TabsTrigger value="template"><LayoutTemplate className="mr-2 h-4 w-4"/> Template</TabsTrigger>
-                <TabsTrigger value="style"><Palette className="mr-2 h-4 w-4"/> Style</TabsTrigger>
-              </TabsList>
-              <TabsContent value="edit">
-                <ResumeForm 
-                  resumeData={resumeData} 
-                  setResumeData={setResumeData} 
-                  onWatchAd={incrementAdsWatched}
-                />
-              </TabsContent>
-              <TabsContent value="template">
-                <TemplateSelector
-                  templates={templates}
-                  selectedTemplate={selectedTemplate}
-                  onSelect={setSelectedTemplate}
-                />
-              </TabsContent>
-              <TabsContent value="style">
-                <ResumeStyler 
-                  resumeStyles={resumeData.styles} 
-                  setResumeData={setResumeData} 
-                />
-              </TabsContent>
-            </Tabs>
-        </div>
-        <div className="lg:col-span-7 lg:sticky top-8">
-          <ResumePreview 
-            resumeData={resumeData} 
-            template={selectedTemplate} 
-            adsWatched={adsWatched} 
-            onWatchAd={incrementAdsWatched}
-          />
-        </div>
+      <div className="w-full max-w-5xl mx-auto">
+        <Tabs defaultValue="edit" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="edit"><PenSquare className="mr-2 h-4 w-4"/> Edit Content</TabsTrigger>
+            <TabsTrigger value="style"><Palette className="mr-2 h-4 w-4"/> Style & Template</TabsTrigger>
+            <TabsTrigger value="preview"><Eye className="mr-2 h-4 w-4"/> Preview & Export</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="edit">
+            <ResumeForm 
+              resumeData={resumeData} 
+              setResumeData={setResumeData} 
+              onWatchAd={incrementAdsWatched}
+            />
+          </TabsContent>
+          
+          <TabsContent value="style">
+            <StyleTemplateForm
+              templates={templates}
+              selectedTemplate={selectedTemplate}
+              onSelectTemplate={setSelectedTemplate}
+              resumeData={resumeData}
+              setResumeData={setResumeData}
+            />
+          </TabsContent>
+
+          <TabsContent value="preview">
+            <ResumePreview 
+              resumeData={resumeData} 
+              template={selectedTemplate} 
+              adsWatched={adsWatched} 
+              onWatchAd={incrementAdsWatched}
+            />
+          </TabsContent>
+
+        </Tabs>
       </div>
     </>
   );

@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import type { ResumeData, Template, ATSCheckResult } from "@/lib/types";
@@ -181,12 +180,12 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
 
   return (
     <>
-      <Card className="shadow-lg h-full">
+      <Card className="shadow-lg h-full bg-card">
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-2 text-2xl">Preview</CardTitle>
-              <CardDescription>Your resume is ready! Check ATS or export.</CardDescription>
+              <CardTitle className="flex items-center gap-2 text-2xl">Preview & Export</CardTitle>
+              <CardDescription>Your resume is ready! Check ATS or export it.</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={handleAtsCheck} disabled={isAtsLoading || !canUseAi}>
@@ -213,8 +212,8 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
             </div>
           </div>
         </CardHeader>
-        <CardContent className="bg-gray-100 rounded-b-lg p-4 md:p-8 shadow-inner overflow-y-auto" style={{minHeight: '800px'}}>
-          <div ref={printRef} className="bg-white p-8 rounded-md shadow-md aspect-[210/297] mx-auto" style={{width: '210mm'}}>
+        <CardContent className="bg-muted/30 rounded-b-lg p-4 md:p-8 shadow-inner overflow-y-auto">
+          <div ref={printRef} className="bg-white p-8 rounded-md shadow-md mx-auto" style={{width: '210mm', minHeight: '297mm'}}>
             <MarkdownRenderer 
               content={finalMarkdown} 
               templateId={template.id} 
@@ -242,6 +241,3 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
     </>
   );
 }
-
-
-
