@@ -6,7 +6,7 @@ import type { ResumeData, Template } from "@/lib/types";
 import TemplateSelector from "@/components/resume/template-selector";
 import ResumeStyler from "@/components/resume/resume-styler";
 import MarkdownRenderer from "./markdown-renderer";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { fillTemplate } from "@/lib/template-utils";
 import { Card, CardContent } from "../ui/card";
 
@@ -25,21 +25,21 @@ const dummyResumeData: ResumeData = {
         phone: "555-123-4567",
         website: "johndoe.dev",
     },
-    summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.",
+    summary: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. ",
     experience: [
         {
             company: "Innovate Corp",
             title: "Senior Product Manager",
             startDate: "Jan 2022",
             endDate: "Present",
-            description: "Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            description: "Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis. Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus.",
         },
         {
             company: "Tech Solutions",
             title: "Software Developer",
             startDate: "Jun 2019",
             endDate: "Dec 2021",
-            description: "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit.",
+            description: "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta. ",
         },
     ],
     education: [
@@ -48,7 +48,7 @@ const dummyResumeData: ResumeData = {
             degree: "Master of Science",
             startDate: "2017",
             endDate: "2019",
-            details: "Focused on human-computer interaction and data visualization. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+            details: "Focused on human-computer interaction and data visualization. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. ",
         },
     ],
     skills: "React, TypeScript, Node.js, Project Management, Agile Methodologies, UI/UX Design",
@@ -69,7 +69,6 @@ export default function StyleTemplateForm({
 }: StyleTemplateFormProps) {
   
   const finalMarkdown = useMemo(() => {
-    // We use the dummy data but apply the REAL styles from the user's resumeData
     const dataForPreview: ResumeData = {
         ...dummyResumeData,
         styles: resumeData.styles,
@@ -91,16 +90,31 @@ export default function StyleTemplateForm({
         />
       </div>
       <div className="hidden lg:block sticky top-24">
-         <Card className="shadow-lg h-full bg-card">
-            <CardContent className="bg-muted/30 rounded-b-lg p-4 md:p-8 shadow-inner overflow-y-auto">
-                <div className="bg-white p-8 rounded-md shadow-md mx-auto" style={{width: '210mm', minHeight: '297mm', transform: 'scale(0.8)', transformOrigin: 'top center'}}>
+         <Card className="shadow-lg h-full bg-card overflow-hidden">
+            <CardContent className="bg-muted/30 rounded-b-lg p-4 md:p-8 shadow-inner overflow-auto h-[calc(100vh-10rem)]">
+              {/* This outer container handles the scaling */}
+              <div
+                className="mx-auto"
+                style={{
+                  width: '100%',
+                  aspectRatio: '1 / 1.414', // A4 aspect ratio
+                  transformOrigin: 'top center',
+                  transform: `scale(var(--scale-factor, 0.5))`,
+                }}
+              >
+                {/* This inner container has the fixed A4 dimensions for content layout */}
+                <div
+                    className="bg-white p-8 shadow-md" 
+                    style={{width: '210mm', height: '297mm'}}
+                >
                     <MarkdownRenderer 
-                    content={finalMarkdown} 
-                    templateId={selectedTemplate.id} 
-                    className={selectedTemplate.style} 
-                    styles={resumeData.styles}
+                        content={finalMarkdown} 
+                        templateId={selectedTemplate.id} 
+                        className={selectedTemplate.style} 
+                        styles={resumeData.styles}
                     />
                 </div>
+              </div>
             </CardContent>
         </Card>
       </div>
