@@ -32,14 +32,14 @@ const dummyResumeData: ResumeData = {
             title: "Senior Product Manager",
             startDate: "Jan 2022",
             endDate: "Present",
-            description: "Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis. Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus.",
+            description: "- Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo.\n- In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n- Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet.",
         },
         {
             company: "Tech Solutions",
             title: "Software Developer",
             startDate: "Jun 2019",
             endDate: "Dec 2021",
-            description: "Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta. ",
+            description: "- Nulla ut erat id mauris vulputate elementum. Nullam varius.\n- Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit.\n- Vivamus vel nulla eget eros elementum pellentesque.",
         },
     ],
     education: [
@@ -48,7 +48,7 @@ const dummyResumeData: ResumeData = {
             degree: "Master of Science",
             startDate: "2017",
             endDate: "2019",
-            details: "Focused on human-computer interaction and data visualization. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. ",
+            details: "- Focused on human-computer interaction and data visualization.\n- Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.\n- Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.",
         },
     ],
     skills: "React, TypeScript, Node.js, Project Management, Agile Methodologies, UI/UX Design",
@@ -100,7 +100,6 @@ export default function StyleTemplateForm({
                 className="mx-auto origin-top"
                 style={{
                   width: '210mm',
-                  height: '297mm',
                   transform: 'scale(0.8)',
                   transformOrigin: 'top center',
                 }}
@@ -108,7 +107,7 @@ export default function StyleTemplateForm({
                 {/* This inner container has the fixed A4 dimensions for content layout */}
                 <div
                     className="bg-white p-8 shadow-md" 
-                    style={{width: '210mm', height: '297mm'}}
+                    style={{width: '210mm', minHeight: '297mm'}}
                 >
                     <MemoizedMarkdownRenderer 
                         content={finalMarkdown} 
