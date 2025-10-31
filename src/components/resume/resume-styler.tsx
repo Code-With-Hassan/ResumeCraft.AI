@@ -40,8 +40,11 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
     property: keyof ResumeStyles[keyof ResumeStyles],
     value: string | number
   ) => {
-    // Ensure numeric values are handled correctly
-    const numericValue = (typeof value === 'string') ? parseFloat(value) : value;
+    let finalValue: string | number = value;
+    if (typeof value === 'string' && property !== 'fontFamily' && property !== 'color') {
+        const parsedValue = parseFloat(value);
+        finalValue = isNaN(parsedValue) ? 0 : parsedValue;
+    }
 
     setResumeData(prev => ({
       ...prev,
@@ -49,7 +52,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
         ...safeResumeStyles,
         [element]: {
           ...safeResumeStyles[element],
-          [property]: numericValue
+          [property]: finalValue
         }
       }
     }));
