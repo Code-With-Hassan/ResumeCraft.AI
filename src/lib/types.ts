@@ -37,6 +37,7 @@ export interface ResumeStyles {
   h2: StyleSetting;
   h3: StyleSetting;
   p: StyleSetting;
+  li: StyleSetting;
 }
 
 export interface ResumeData {

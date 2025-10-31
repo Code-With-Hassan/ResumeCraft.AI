@@ -18,12 +18,13 @@ const defaultStyles: ResumeStyles = {
     h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginTop: 0, marginBottom: 4 },
     h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
     p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
+    li: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 1 },
 };
 
 export default function MarkdownRenderer({ content, templateId, className, styles }: MarkdownRendererProps) {
   const safeStyles = styles || defaultStyles;
 
-  const getStyle = (tag: 'h1' | 'h2' | 'h3' | 'p'): React.CSSProperties => {
+  const getStyle = (tag: 'h1' | 'h2' | 'h3' | 'p' | 'li'): React.CSSProperties => {
     const style = safeStyles[tag];
     return {
       fontFamily: style.fontFamily,
@@ -54,7 +55,7 @@ export default function MarkdownRenderer({ content, templateId, className, style
         if (rawContent.startsWith('# ')) return <h1 key={index} className={cn("", centerClass)} style={getStyle('h1')}>{renderContent(rawContent.substring(2))}</h1>;
         if (rawContent.startsWith('> ')) return <blockquote key={index} className={cn("border-l-4 border-primary pl-4 italic my-0", centerClass)}>{rawContent.substring(2)}</blockquote>;
         if (rawContent.startsWith('---')) return <div key={index} className={cn("bg-gray-300 my-2")} style={{height: '0.1em'}}></div>;
-        if (rawContent.startsWith('- ')) return <li key={index} className={cn("ml-4", centerClass)} style={getStyle('p')}>{renderContent(rawContent.substring(2))}</li>;
+        if (rawContent.startsWith('- ')) return <li key={index} className={cn("ml-4", centerClass)} style={getStyle('li')}>{renderContent(rawContent.substring(2))}</li>;
         
         return <p key={index} className={cn("", centerClass)} style={getStyle('p')}>{renderContent(rawContent)}</p>;
       })}

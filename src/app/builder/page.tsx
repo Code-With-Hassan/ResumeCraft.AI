@@ -61,6 +61,7 @@ const initialResumeData: ResumeData = {
     h2: { fontSize: 22, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginTop: 0, marginBottom: 4 },
     h3: { fontSize: 18, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
     p: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
+    li: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 1 },
   }
 };
 

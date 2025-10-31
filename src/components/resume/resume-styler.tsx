@@ -29,6 +29,7 @@ const defaultStyles: ResumeStyles = {
     h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginTop: 0, marginBottom: 4 },
     h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
     p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
+    li: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 1 },
 };
 
 export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStylerProps) {
@@ -205,6 +206,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
         <StyleEditor element="h2" title="Section Titles (H2)" />
         <StyleEditor element="h3" title="Job/Degree Titles (H3)" />
         <StyleEditor element="p" title="Paragraphs (p)" />
+        <StyleEditor element="li" title="List Items (li)" />
       </CardContent>
     </Card>
   );
