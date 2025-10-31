@@ -28,6 +28,7 @@ export interface StyleSetting {
   color: string; // hex color
   lineHeight: number; // multiplier, e.g., 1.5
   letterSpacing: number; // in px
+  marginTop: number; // in px
   marginBottom: number; // in px
 }
 

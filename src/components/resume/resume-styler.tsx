@@ -25,10 +25,10 @@ const FONT_FAMILIES = [
 ];
 
 const defaultStyles: ResumeStyles = {
-    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginBottom: 4 },
-    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 4 },
-    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginBottom: 2 },
-    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginBottom: 2 },
+    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginTop: 0, marginBottom: 4 },
+    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginTop: 0, marginBottom: 4 },
+    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
+    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
 };
 
 export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStylerProps) {
@@ -148,6 +148,24 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
                 value={styles.letterSpacing}
                 onChange={(e) => handleStyleChange(element, 'letterSpacing', e.target.value)}
                 step={0.1}
+                className="w-20"
+              />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Margin Top (px)</Label>
+           <div className="flex items-center gap-4">
+            <Slider
+              value={[styles.marginTop]}
+              onValueChange={([val]) => handleStyleChange(element, 'marginTop', val)}
+              min={0}
+              max={48}
+              step={1}
+            />
+             <Input
+                type="number"
+                value={styles.marginTop}
+                onChange={(e) => handleStyleChange(element, 'marginTop', e.target.value)}
                 className="w-20"
               />
           </div>

@@ -14,10 +14,10 @@ interface MarkdownRendererProps {
 }
 
 const defaultStyles: ResumeStyles = {
-    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginBottom: 4 },
-    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 4 },
-    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginBottom: 2 },
-    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginBottom: 2 },
+    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginTop: 0, marginBottom: 4 },
+    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginTop: 0, marginBottom: 4 },
+    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
+    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
 };
 
 export default function MarkdownRenderer({ content, templateId, className, styles }: MarkdownRendererProps) {
@@ -31,7 +31,7 @@ export default function MarkdownRenderer({ content, templateId, className, style
       color: style.color,
       lineHeight: style.lineHeight,
       letterSpacing: `${style.letterSpacing}px`,
-      marginTop: '0',
+      marginTop: `${style.marginTop}px`,
       marginBottom: `${style.marginBottom}px`,
     };
   };
