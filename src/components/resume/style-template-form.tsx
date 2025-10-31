@@ -6,7 +6,7 @@ import type { ResumeData, Template } from "@/lib/types";
 import TemplateSelector from "@/components/resume/template-selector";
 import ResumeStyler from "@/components/resume/resume-styler";
 import MarkdownRenderer from "./markdown-renderer";
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo, memo } from "react";
 import { fillTemplate } from "@/lib/template-utils";
 import { Card, CardContent } from "../ui/card";
 
@@ -53,12 +53,14 @@ const dummyResumeData: ResumeData = {
     ],
     skills: "React, TypeScript, Node.js, Project Management, Agile Methodologies, UI/UX Design",
     styles: { // This will be overwritten by real styles
-      h1: { fontSize: 30, fontFamily: "var(--font-headline)", color: "#000000" },
-      h2: { fontSize: 22, fontFamily: "var(--font-headline)", color: "#000000" },
-      h3: { fontSize: 18, fontFamily: "var(--font-headline)", color: "#000000" },
-      p: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333" },
+      h1: { fontSize: 30, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginBottom: 4 },
+      h2: { fontSize: 22, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 4 },
+      h3: { fontSize: 18, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginBottom: 2 },
+      p: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginBottom: 2 },
     }
 };
+
+const MemoizedMarkdownRenderer = memo(MarkdownRenderer);
 
 export default function StyleTemplateForm({
   resumeData,
@@ -94,12 +96,12 @@ export default function StyleTemplateForm({
             <CardContent className="bg-muted/30 rounded-b-lg p-4 md:p-8 shadow-inner overflow-auto h-[calc(100vh-10rem)]">
               {/* This outer container handles the scaling */}
               <div
-                className="mx-auto"
+                className="mx-auto origin-top"
                 style={{
-                  width: '100%',
-                  aspectRatio: '1 / 1.414', // A4 aspect ratio
+                  width: '210mm',
+                  height: '297mm',
+                  transform: 'scale(0.8)',
                   transformOrigin: 'top center',
-                  transform: `scale(var(--scale-factor, 0.5))`,
                 }}
               >
                 {/* This inner container has the fixed A4 dimensions for content layout */}
@@ -107,7 +109,7 @@ export default function StyleTemplateForm({
                     className="bg-white p-8 shadow-md" 
                     style={{width: '210mm', height: '297mm'}}
                 >
-                    <MarkdownRenderer 
+                    <MemoizedMarkdownRenderer 
                         content={finalMarkdown} 
                         templateId={selectedTemplate.id} 
                         className={selectedTemplate.style} 
