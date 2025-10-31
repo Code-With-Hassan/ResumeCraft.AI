@@ -25,11 +25,11 @@ const FONT_FAMILIES = [
 ];
 
 const defaultStyles: ResumeStyles = {
-    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginTop: 0, marginBottom: 4 },
-    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginTop: 0, marginBottom: 4 },
-    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
-    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 2 },
-    li: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginTop: 0, marginBottom: 1 },
+    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, paddingTop: 0, paddingBottom: 4 },
+    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, paddingTop: 0, paddingBottom: 4 },
+    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, paddingTop: 0, paddingBottom: 2 },
+    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, paddingTop: 0, paddingBottom: 2 },
+    li: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, paddingTop: 0, paddingBottom: 1 },
 };
 
 export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStylerProps) {
@@ -41,11 +41,8 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
     property: keyof ResumeStyles[keyof ResumeStyles],
     value: string | number
   ) => {
-    let finalValue: string | number = value;
-    if (typeof value === 'string' && property !== 'fontFamily' && property !== 'color') {
-        const parsedValue = parseFloat(value);
-        finalValue = isNaN(parsedValue) ? 0 : parsedValue;
-    }
+    const parsedValue = parseFloat(value as string);
+    const finalValue = (property !== 'fontFamily' && property !== 'color' && isNaN(parsedValue)) ? 0 : value;
 
     setResumeData(prev => ({
       ...prev,
@@ -154,37 +151,37 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Margin Top (px)</Label>
+          <Label>Padding Top (px)</Label>
            <div className="flex items-center gap-4">
             <Slider
-              value={[styles.marginTop]}
-              onValueChange={([val]) => handleStyleChange(element, 'marginTop', val)}
+              value={[styles.paddingTop]}
+              onValueChange={([val]) => handleStyleChange(element, 'paddingTop', val)}
               min={0}
               max={48}
               step={1}
             />
              <Input
                 type="number"
-                value={styles.marginTop}
-                onChange={(e) => handleStyleChange(element, 'marginTop', e.target.value)}
+                value={styles.paddingTop}
+                onChange={(e) => handleStyleChange(element, 'paddingTop', e.target.value)}
                 className="w-20"
               />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Margin Bottom (px)</Label>
+          <Label>Padding Bottom (px)</Label>
            <div className="flex items-center gap-4">
             <Slider
-              value={[styles.marginBottom]}
-              onValueChange={([val]) => handleStyleChange(element, 'marginBottom', val)}
+              value={[styles.paddingBottom]}
+              onValueChange={([val]) => handleStyleChange(element, 'paddingBottom', val)}
               min={0}
               max={48}
               step={1}
             />
              <Input
                 type="number"
-                value={styles.marginBottom}
-                onChange={(e) => handleStyleChange(element, 'marginBottom', e.target.value)}
+                value={styles.paddingBottom}
+                onChange={(e) => handleStyleChange(element, 'paddingBottom', e.target.value)}
                 className="w-20"
               />
           </div>
