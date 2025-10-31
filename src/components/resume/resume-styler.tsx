@@ -25,10 +25,10 @@ const FONT_FAMILIES = [
 ];
 
 const defaultStyles: ResumeStyles = {
-    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
-    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
-    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000" },
-    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333" },
+    h1: { fontSize: 30, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginBottom: 4 },
+    h2: { fontSize: 22, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 4 },
+    h3: { fontSize: 18, fontFamily: fontHeadline.style.fontFamily, color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginBottom: 2 },
+    p: { fontSize: 11, fontFamily: fontBody.style.fontFamily, color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginBottom: 2 },
 };
 
 export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStylerProps) {
@@ -41,7 +41,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
     value: string | number
   ) => {
     // Ensure numeric values are handled correctly
-    const numericValue = (property === 'fontSize' && typeof value === 'string') ? parseInt(value, 10) : value;
+    const numericValue = (typeof value === 'string') ? parseFloat(value) : value;
 
     setResumeData(prev => ({
       ...prev,
@@ -80,7 +80,7 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
               />
           </div>
         </div>
-        <div className="space-y-2">
+         <div className="space-y-2">
           <Label>Font Family</Label>
           <Select
             value={styles.fontFamily}
@@ -109,6 +109,62 @@ export default function ResumeStyler({ resumeStyles, setResumeData }: ResumeStyl
               onChange={(e) => handleStyleChange(element, 'color', e.target.value)}
               className="w-24"
             />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Line Height</Label>
+           <div className="flex items-center gap-4">
+            <Slider
+              value={[styles.lineHeight]}
+              onValueChange={([val]) => handleStyleChange(element, 'lineHeight', val)}
+              min={0.8}
+              max={2.5}
+              step={0.1}
+            />
+             <Input
+                type="number"
+                value={styles.lineHeight}
+                onChange={(e) => handleStyleChange(element, 'lineHeight', e.target.value)}
+                step={0.1}
+                className="w-20"
+              />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Letter Spacing (px)</Label>
+           <div className="flex items-center gap-4">
+            <Slider
+              value={[styles.letterSpacing]}
+              onValueChange={([val]) => handleStyleChange(element, 'letterSpacing', val)}
+              min={-2}
+              max={5}
+              step={0.1}
+            />
+             <Input
+                type="number"
+                value={styles.letterSpacing}
+                onChange={(e) => handleStyleChange(element, 'letterSpacing', e.target.value)}
+                step={0.1}
+                className="w-20"
+              />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Margin Bottom (px)</Label>
+           <div className="flex items-center gap-4">
+            <Slider
+              value={[styles.marginBottom]}
+              onValueChange={([val]) => handleStyleChange(element, 'marginBottom', val)}
+              min={0}
+              max={48}
+              step={1}
+            />
+             <Input
+                type="number"
+                value={styles.marginBottom}
+                onChange={(e) => handleStyleChange(element, 'marginBottom', e.target.value)}
+                className="w-20"
+              />
           </div>
         </div>
       </div>

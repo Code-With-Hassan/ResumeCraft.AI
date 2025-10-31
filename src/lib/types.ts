@@ -26,6 +26,9 @@ export interface StyleSetting {
   fontSize: number; // in px
   fontFamily: string;
   color: string; // hex color
+  lineHeight: number; // multiplier, e.g., 1.5
+  letterSpacing: number; // in px
+  marginBottom: number; // in px
 }
 
 export interface ResumeStyles {

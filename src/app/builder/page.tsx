@@ -57,10 +57,10 @@ const initialResumeData: ResumeData = {
   ],
   skills: "TypeScript, React, Node.js, Python, PostgreSQL, AWS, Docker, Kubernetes",
   styles: {
-    h1: { fontSize: 30, fontFamily: "var(--font-headline)", color: "#000000" },
-    h2: { fontSize: 22, fontFamily: "var(--font-headline)", color: "#000000" },
-    h3: { fontSize: 18, fontFamily: "var(--font-headline)", color: "#000000" },
-    p: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333" },
+    h1: { fontSize: 30, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.2, letterSpacing: -1, marginBottom: 4 },
+    h2: { fontSize: 22, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.2, letterSpacing: -0.5, marginBottom: 4 },
+    h3: { fontSize: 18, fontFamily: "var(--font-headline)", color: "#000000", lineHeight: 1.3, letterSpacing: 0, marginBottom: 2 },
+    p: { fontSize: 11, fontFamily: "var(--font-body)", color: "#333333", lineHeight: 1.5, letterSpacing: 0, marginBottom: 2 },
   }
 };
 
