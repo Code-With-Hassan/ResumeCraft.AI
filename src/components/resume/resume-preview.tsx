@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
 import { AdFactory } from "@/lib/ads/AdFactory";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 
 interface ResumePreviewProps {
@@ -41,19 +43,30 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
   const [isAtsDialogOpen, setIsAtsDialogOpen] = useState(false);
   const [adDialogOpen, setAdDialogOpen] = useState(false);
   const [adActionType, setAdActionType] = useState<'pdf' | 'ats' | null>(null);
+  const [fileNameDialogOpen, setFileNameDialogOpen] = useState(false);
+  const [downloadFormat, setDownloadFormat] = useState<'pdf' | 'md' | null>(null);
+  const [fileName, setFileName] = useState('resume');
   const printRef = useRef<HTMLDivElement>(null);
   
   const canUseAi = !!user;
 
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
 
-  const handleDownload = async (format: 'md' | 'pdf') => {
-    if (format === 'md') {
+  const startDownloadProcess = (format: 'md' | 'pdf') => {
+    setDownloadFormat(format);
+    setFileNameDialogOpen(true);
+  }
+
+  const handleDownload = async () => {
+    setFileNameDialogOpen(false);
+    if (!downloadFormat) return;
+
+    if (downloadFormat === 'md') {
         const blob = new Blob([finalMarkdown], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'resume.md';
+        a.download = `${fileName}.md`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -61,7 +74,7 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
         return;
     }
     
-    if (format === 'pdf') {
+    if (downloadFormat === 'pdf') {
         if (!user) {
             toast({ title: "Authentication Required", description: "Please log in to download a PDF.", variant: "destructive" });
             return;
@@ -115,7 +128,7 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
             heightLeft -= pdfHeight;
         }
 
-        pdf.save('resume.pdf');
+        pdf.save(`${fileName}.pdf`);
 
     } catch (error) {
         console.error("PDF generation failed:", error);
@@ -199,11 +212,11 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleDownload('pdf')} disabled={isPdfLoading}>
+                    <DropdownMenuItem onClick={() => startDownloadProcess('pdf')} disabled={isPdfLoading}>
                          {isPdfLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                          PDF {template.isPremium && <Star className="ml-2 h-3 w-3 fill-amber-300 text-amber-500" />}
                     </DropdownMenuItem>
-                     <DropdownMenuItem onClick={() => handleDownload('md')}>
+                     <DropdownMenuItem onClick={() => startDownloadProcess('md')}>
                         <Download className="mr-2 h-4 w-4" />
                         Markdown
                     </DropdownMenuItem>
@@ -238,6 +251,35 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
+    <AlertDialog open={fileNameDialogOpen} onOpenChange={setFileNameDialogOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Enter File Name</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Please provide a name for your file before downloading.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="fileName" className="text-right">
+                        File Name
+                    </Label>
+                    <Input
+                        id="fileName"
+                        value={fileName}
+                        onChange={(e) => setFileName(e.target.value)}
+                        className="col-span-3"
+                    />
+                </div>
+            </div>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setDownloadFormat(null)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDownload}>Confirm</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
     </>
   );
 }
+
+    

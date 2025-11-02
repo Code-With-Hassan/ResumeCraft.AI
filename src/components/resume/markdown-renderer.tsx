@@ -34,6 +34,7 @@ export default function MarkdownRenderer({ content, templateId, className, style
       letterSpacing: `${style.letterSpacing}px`,
       paddingTop: `${style.paddingTop}px`,
       paddingBottom: `${style.paddingBottom}px`,
+      listStyleType: 'none'
     };
   };
 
@@ -54,7 +55,8 @@ export default function MarkdownRenderer({ content, templateId, className, style
         if (rawContent.startsWith('## ')) return <h2 key={index} className={cn("my-0", centerClass)} style={getStyle('h2')}>{renderContent(rawContent.substring(3))}</h2>;
         if (rawContent.startsWith('# ')) return <h1 key={index} className={cn("my-0", centerClass)} style={getStyle('h1')}>{renderContent(rawContent.substring(2))}</h1>;
         if (rawContent.startsWith('> ')) return <blockquote key={index} className={cn("border-l-4 border-primary pl-4 italic my-0")}>{rawContent.substring(2)}</blockquote>;
-        if (rawContent.startsWith('---')) return <div key={index} className={cn("bg-gray-300 my-2")} style={{height: '0.1em'}}></div>;
+        if (rawContent.startsWith('{{space}}')) return <div key={index} className="py-2"></div>;
+        if (rawContent.startsWith('---')) return <div key={index} className={cn("bg-gray-300 mt-4")} style={{height: '0.1em'}}></div>;
         if (rawContent.startsWith('- ')) return <li key={index} className={cn("ml-4 my-0", centerClass)} style={getStyle('li')}>{renderContent(rawContent.substring(2))}</li>;
         
         return <p key={index} className={cn("my-0", centerClass)} style={getStyle('p')}>{renderContent(rawContent)}</p>;
