@@ -69,11 +69,30 @@ export default function BuilderPage() {
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeData);
   const [selectedTemplate, setSelectedTemplate] = useState<Template>(templates[0]);
   const [adsWatched, setAdsWatched] = useState(0);
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const { toast } = useToast();
   
   useEffect(() => {
+    // Check for locally saved data first
+    const savedDataRaw = localStorage.getItem('resumeData-unsaved');
+    if (savedDataRaw) {
+      try {
+        const savedData = JSON.parse(savedDataRaw);
+        setResumeData(savedData);
+        localStorage.removeItem('resumeData-unsaved'); // Clear it after loading
+        toast({
+          title: 'Welcome Back!',
+          description: 'Your unsaved work has been restored.',
+        });
+        // We stop here to not overwrite the restored data with Firestore data
+        return;
+      } catch (e) {
+        console.error("Failed to parse unsaved resume data from localStorage", e);
+        localStorage.removeItem('resumeData-unsaved');
+      }
+    }
+    
     const loadResumeFromFirestore = async () => {
       if (user && firestore) {
         const docRef = doc(firestore, "users", user.uid, "resumes", "default_resume");
@@ -102,9 +121,12 @@ export default function BuilderPage() {
       }
     };
 
-    loadResumeFromFirestore();
+    // Only load from firestore if user is loaded and not during initial auth check
+    if (!isUserLoading) {
+      loadResumeFromFirestore();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore]);
+  }, [user, firestore, isUserLoading]);
 
   const incrementAdsWatched = () => {
      if (adsWatched < 3) {

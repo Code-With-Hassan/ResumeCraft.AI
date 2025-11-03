@@ -25,6 +25,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { AdFactory } from "@/lib/ads/AdFactory";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useRouter } from 'next/navigation';
 
 
 interface ResumePreviewProps {
@@ -37,6 +38,7 @@ interface ResumePreviewProps {
 export default function ResumePreview({ resumeData, template, adsWatched, onWatchAd }: ResumePreviewProps) {
   const { toast } = useToast();
   const { user } = useUser();
+  const router = useRouter();
   const [atsResult, setAtsResult] = useState<ATSCheckResult>(null);
   const [isAtsLoading, setIsAtsLoading] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
@@ -53,6 +55,16 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
   const finalMarkdown = useMemo(() => fillTemplate(template.markdown, resumeData), [template, resumeData]);
 
   const startDownloadProcess = (format: 'md' | 'pdf') => {
+    if (!user) {
+      toast({
+        title: "Please log in to export",
+        description: "Saving your work and taking you to the login page.",
+      });
+      localStorage.setItem("resumeData-unsaved", JSON.stringify(resumeData));
+      router.push('/login');
+      return;
+    }
+
     setDownloadFormat(format);
     setFileNameDialogOpen(true);
   }
@@ -75,7 +87,7 @@ export default function ResumePreview({ resumeData, template, adsWatched, onWatc
     }
     
     if (downloadFormat === 'pdf') {
-        if (!user) {
+        if (!user) { // This check is now redundant due to the check in startDownloadProcess but good for safety
             toast({ title: "Authentication Required", description: "Please log in to download a PDF.", variant: "destructive" });
             return;
         }
